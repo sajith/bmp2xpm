@@ -318,15 +318,6 @@ colorify = undefined
 
 -----------------------------------------------------------------------------
 
--- TODO: ALL WRONG, REDO.
--- xpmFormBody :: BL.ByteString -> [(ColorIndex, ColorTriplet)]
--- xpmFormBody bmpbody = colors  -- BLC.pack "test"
---   where
---     body   = toWord32Arr bmpbody
---     colors = map (colorify . head) $ group $ sort body  -- find unique elements
-
------------------------------------------------------------------------------
-
 writeXpmFile :: Handle -> XpmData -> IO ()
 writeXpmFile handle body = do
     putStrLn "Writing file..."
