@@ -223,8 +223,8 @@ runConversion bmpHandle xpmHandle = do
 
 -----------------------------------------------------------------------------
 
--- type Width  = Integer
--- type Height = Integer
+type Width  = Integer
+type Height = Integer
 
 -----------------------------------------------------------------------------
 
@@ -244,15 +244,17 @@ type XpmData = BLC.ByteString
 -----------------------------------------------------------------------------
 
 makeXpm :: BmpFile -> XpmData
-makeXpm (BmpFile hdr info bitmap) = BLC.pack xmap
+makeXpm (BmpFile _ info bitmap) = BLC.pack xmap
   where
-    width  = imageWidth info
-    height = imageHeight info
+    width  = fromIntegral $ imageWidth info
+    height = fromIntegral $ imageHeight info
     xmap   = makeXpmBitmap height width bitmap
 
-makeXpmBitmap 0 w b = ""
+makeXpmBitmap :: Height -> Width -> [BmpPixel] -> String
+makeXpmBitmap 0 _ _ = ""
 makeXpmBitmap h w b = makeXpmRow w b ++ makeXpmBitmap (h-1) w b
 
+makeXpmRow :: (Eq a, Num a) => a -> t -> [Char]
 makeXpmRow w b | w == 0 || w == 1 || w == 2 = "" -- this is padding
                | otherwise = makeXpmRow (w-1) b
 
@@ -295,16 +297,21 @@ type XpmBody   = BL.ByteString
 
 -----------------------------------------------------------------------------
 
-charsPerPixel = 2
-nColors = 256
+xpmCharsPerPixel :: Integer
+xpmCharsPerPixel = 2
 
--- formXpmHeader :: BmpHeader -> BmpInfo -> XpmHeader
-formXpmHeader h i = -- BL.pack $
-                    "static char *work[] = {\n"
-                    ++ show (imageWidth i) ++ " " ++ show (imageHeight i) ++ " "
-                    ++ show nColors ++ " " ++ show charsPerPixel ++ "\",\n"
-                    ++ makeXpmColorIndex
+xpmNumColors :: Integer
+xpmNumColors = 256
 
+-- TODO: ALL WRONG, REDO.
+formXpmHeader :: BmpInfoHeader -> String
+formXpmHeader i = -- BL.pack $
+    "static char *work[] = {\n"
+    ++ show (imageWidth i) ++ " " ++ show (imageHeight i) ++ " "
+    ++ show xpmNumColors ++ " " ++ show xpmCharsPerPixel ++ "\",\n"
+    ++ makeXpmColorIndex
+
+-- TODO: ALL WRONG, REDO.
 makeXpmColorIndex :: String
 makeXpmColorIndex = ""
 
@@ -313,12 +320,13 @@ makeXpmColorIndex = ""
 type ColorIndex = String
 type ColorTriplet = String
 
--- colorify :: Word32 -> (ColorIndex, ColorTriplet)
+colorify :: Word32 -> (ColorIndex, ColorTriplet)
 colorify color = undefined
 
 -----------------------------------------------------------------------------
 
--- formXpmBody :: BmpBody -> XpmBody
+-- TODO: ALL WRONG, REDO.
+formXpmBody :: BL.ByteString -> [(ColorIndex, ColorTriplet)]
 formXpmBody bmpbody = colors  -- BLC.pack "test"
   where
     body   = toWord32Arr bmpbody
