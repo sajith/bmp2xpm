@@ -1,4 +1,6 @@
 *.hi
 *.o
 *.exe
+*.xpm
 dist/
+
