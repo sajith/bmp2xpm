@@ -303,11 +303,13 @@ xpmCharsPerPixel = 2
 xpmNumColors :: Integer
 xpmNumColors = 256
 
+type XpmName = String
+
 -- TODO: ALL WRONG, REDO.
-formXpmHeader :: BmpInfoHeader -> String
-formXpmHeader i = -- BL.pack $
-    "static char *work[] = {\n"
-    ++ show (imageWidth i) ++ " " ++ show (imageHeight i) ++ " "
+xpmFormHeader :: XpmName -> BmpInfoHeader -> String
+xpmFormHeader name info = -- BL.pack $
+    "static char *" ++ show name ++ "[] = {\n"
+    ++ show (imageWidth info) ++ " " ++ show (imageHeight info) ++ " "
     ++ show xpmNumColors ++ " " ++ show xpmCharsPerPixel ++ "\",\n"
     ++ makeXpmColorIndex
 
@@ -320,17 +322,17 @@ makeXpmColorIndex = ""
 type ColorIndex = String
 type ColorTriplet = String
 
-colorify :: Word32 -> (ColorIndex, ColorTriplet)
-colorify color = undefined
+colorify :: BmpPixel -> (ColorIndex, ColorTriplet)
+colorify = undefined
 
 -----------------------------------------------------------------------------
 
 -- TODO: ALL WRONG, REDO.
-formXpmBody :: BL.ByteString -> [(ColorIndex, ColorTriplet)]
-formXpmBody bmpbody = colors  -- BLC.pack "test"
-  where
-    body   = toWord32Arr bmpbody
-    colors = map (colorify . head) $ group $ sort body  -- find unique elements
+-- xpmFormBody :: BL.ByteString -> [(ColorIndex, ColorTriplet)]
+-- xpmFormBody bmpbody = colors  -- BLC.pack "test"
+--   where
+--     body   = toWord32Arr bmpbody
+--     colors = map (colorify . head) $ group $ sort body  -- find unique elements
 
 -----------------------------------------------------------------------------
 
