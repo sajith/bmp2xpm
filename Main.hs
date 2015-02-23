@@ -260,12 +260,6 @@ makeXpmRow w b | w == 0 || w == 1 || w == 2 = "" -- this is padding
 
 -----------------------------------------------------------------------------
 
--- TODO: I should not have to do this.
-toWord32Arr :: BL.ByteString -> [Word32]
-toWord32Arr = unsafeCoerce
-
------------------------------------------------------------------------------
-
 -- xpmChrRange :: String
 -- xpmChrRange = map chr [48..124]
 
