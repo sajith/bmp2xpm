@@ -280,14 +280,11 @@ xpmIndices :: Int -> [String]
 xpmIndices n = take n $ oneLetters ++ twoLetters xpmChrRange
   where
     oneLetters = group xpmChrRange
-    -- twoLetters = map head $ group $ sort $ map (take 2) $ permutations xpmChrRange
 
-twoLetters :: String -> [String]
-twoLetters []     = group ""
-twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
+    twoLetters :: String -> [String]
+    twoLetters []     = group ""
+    twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
 
--- twoL :: String -> String -> [String]
--- twoL xs ys = (map ([x]++)
 
 -----------------------------------------------------------------------------
 
