@@ -234,7 +234,7 @@ getPixels hdr bs = pixels
         width     = fromIntegral $ imageWidth hdr
         height    = fromIntegral $ imageHeight hdr
         offsets   = [0,3.. 3 * (width * height - 1)] :: [Integer]
-        nextBs n = BL.drop (fromIntegral n) bs
+        nextBs n  = BL.drop (fromIntegral n) bs
         pixels    = map (runGet readBmpPixel . nextBs) offsets
 
 -----------------------------------------------------------------------------
