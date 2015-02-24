@@ -44,14 +44,10 @@ import           System.Environment    (getArgs, getProgName)
 import           System.FilePath       (replaceExtension)
 import           System.IO
 
-import           Data.Char             (chr, ord)
+import           Data.Char             (ord)
+import           Data.List             (group, nub)
+import qualified Data.Map              as M
 import           Data.Word             (Word16, Word32, Word8)
-
-import           Data.List             (group, nub, sort)
-import           Unsafe.Coerce         (unsafeCoerce)
-
-import           Data.Set              (Set)
-import qualified Data.Set              as Set
 
 import           Text.Printf           (printf)
 
@@ -227,7 +223,10 @@ runConversion bmpHandle xpmHandle = do
     when (compression bmpinfo /= 0) $
         error "Can't run conversion: I don't know how to handle compressed bitmaps."
 
-    writeXpmFile xpmHandle (makeXpm bmpdata)
+    let xpmdata = makeXpm bmpdata
+    putStrLn$ "Xpm conversion result size: " ++ show (BLC.length xpmdata)
+
+    writeXpmFile xpmHandle xpmdata
 
 -----------------------------------------------------------------------------
 
@@ -248,27 +247,47 @@ getPixels hdr bs = pixels
 -----------------------------------------------------------------------------
 
 type XpmData  = BLC.ByteString
-type XpmPixel = BLC.ByteString
+type XpmPixel = String -- BLC.ByteString
 
 -----------------------------------------------------------------------------
 
-toXpmColor :: BmpPixel -> XpmPixel
-toXpmColor (BmpPixel r g b) = BLC.pack $ printf "#%02x%02x%02x" r g b
+-- toXpmColor :: BmpPixel -> XpmPixel
+-- toXpmColor (BmpPixel r g b) = BLC.pack $ printf "#%02x%02x%02x" r g b
 
 -----------------------------------------------------------------------------
 
 makeXpm :: BmpFile -> XpmData
-makeXpm (BmpFile _ info pixels) = xmap
+makeXpm (BmpFile _ _ pixels) = xmap
   where
-    width  = fromIntegral $ imageWidth info
-    height = fromIntegral $ imageHeight info
-    xmap   = makeXpmBitmap pixels
+    -- width  = fromIntegral $ imageWidth info
+    -- height = fromIntegral $ imageHeight info
+    xmap   = xpmMakeBitmap pixels
 
-makeXpmBitmap :: [BmpPixel] -> XpmData
-makeXpmBitmap pixels = BLC.pack ""
+xpmMakeBitmap :: [BmpPixel] -> XpmData
+xpmMakeBitmap pixels = xpmd
   where
-    set = nub pixels
-    z   = map (\(x, y) -> toXpmColor y)  $ zip (xpmIndices $ length set) set
+    cmap = makeColorMap $ nub pixels
+    xpmd = BLC.pack $ concatMap (\p -> translatePixel cmap p) pixels
+
+translatePixel :: XpmColorMap -> BmpPixel -> XpmPixel
+translatePixel m p = case (M.lookup p m) of
+               Just c  -> c ++ " "
+               Nothing -> ""
+
+-----------------------------------------------------------------------------
+
+type XpmColor    = String
+type XpmColorMap = M.Map BmpPixel XpmColor
+
+-----------------------------------------------------------------------------
+
+toXpmColor :: BmpPixel -> XpmColor
+toXpmColor (BmpPixel r g b) = printf "#%02x%02x%02x" r g b
+
+-----------------------------------------------------------------------------
+
+makeColorMap :: [BmpPixel] -> XpmColorMap
+makeColorMap pixels = M.fromList $ zip pixels xpmIndices
 
 -----------------------------------------------------------------------------
 
@@ -282,15 +301,23 @@ xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
               "!~^/()_`'][{}|"
 
 -- TODO: rewrite this mawky stuff.
-xpmIndices :: Int -> [String]
-xpmIndices n = take n $ oneLetters ++ twoLetters xpmChrRange
+-- xpmIndices :: Int -> [String]
+-- xpmIndices n = take n $ oneLetters ++ twoLetters xpmChrRange
+--   where
+--     oneLetters = group xpmChrRange
+
+--     twoLetters :: String -> [String]
+--     twoLetters []     = group ""
+--     twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
+
+xpmIndices :: [String]
+xpmIndices = oneLetters ++ twoLetters xpmChrRange
   where
     oneLetters = group xpmChrRange
 
     twoLetters :: String -> [String]
     twoLetters []     = group ""
     twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
-
 
 -----------------------------------------------------------------------------
 
