@@ -47,8 +47,13 @@ import           System.IO
 import           Data.Char             (chr, ord)
 import           Data.Word             (Word16, Word32, Word8)
 
-import           Data.List             (group, sort)
+import           Data.List             (group, nub, sort)
 import           Unsafe.Coerce         (unsafeCoerce)
+
+import           Data.Set              (Set)
+import qualified Data.Set              as Set
+
+import           Text.Printf           (printf)
 
 import qualified Data.ByteString.Char8 as BLC
 import qualified Data.ByteString.Lazy  as BL
@@ -85,8 +90,11 @@ data BmpPixel = BmpPixel {
       red   :: Word8
     , green :: Word8
     , blue  :: Word8
-    -- , none  :: Word8
-    } deriving Show
+    } deriving (Show, Ord)
+
+instance Eq BmpPixel where
+    (==) (BmpPixel r g b) (BmpPixel x y z) = r == x && g == y && b == z
+    (/=) a b = not $ (==) a b
 
 -- |
 -- Compression types that can be present in a BMP file.
@@ -239,25 +247,28 @@ getPixels hdr bs = pixels
 
 -----------------------------------------------------------------------------
 
-type XpmData = BLC.ByteString
+type XpmData  = BLC.ByteString
+type XpmPixel = BLC.ByteString
+
+-----------------------------------------------------------------------------
+
+toXpmColor :: BmpPixel -> XpmPixel
+toXpmColor (BmpPixel r g b) = BLC.pack $ printf "#%02x%02x%02x" r g b
 
 -----------------------------------------------------------------------------
 
 makeXpm :: BmpFile -> XpmData
-makeXpm (BmpFile _ info bitmap) = xmap
+makeXpm (BmpFile _ info pixels) = xmap
   where
     width  = fromIntegral $ imageWidth info
     height = fromIntegral $ imageHeight info
-    xmap   = makeXpmBitmap height width bitmap
+    xmap   = makeXpmBitmap pixels
 
-makeXpmBitmap :: Height -> Width -> [BmpPixel] -> XpmData
-makeXpmBitmap _ _ _ = BLC.pack " " -- undefined
--- makeXpmBitmap 0 _ _ = ""
--- makeXpmBitmap h w b = makeXpmRow w b ++ makeXpmBitmap (h-1) w b
-
--- makeXpmRow :: (Eq a, Num a) => a -> t -> [Char]
--- makeXpmRow w b | w == 0 || w == 1 || w == 2 = "" -- this is padding
---                | otherwise = makeXpmRow (w-1) b
+makeXpmBitmap :: [BmpPixel] -> XpmData
+makeXpmBitmap pixels = BLC.pack ""
+  where
+    set = nub pixels
+    z   = map (\(x, y) -> toXpmColor y)  $ zip (xpmIndices $ length set) set
 
 -----------------------------------------------------------------------------
 
