@@ -106,7 +106,8 @@ data CompressionTypes = None | EightBitRL | FourBitRL | RGBBitmapWithMask
                       deriving (Ord, Enum, Show, Read, Eq)
 
 -- type BmpBitmap = BL.ByteString
-type BmpBitmap = [BmpPixel]
+type BmpRow    = [BmpPixel]
+type BmpBitmap = [BmpRow]
 
 data BmpFile = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
 
@@ -235,8 +236,9 @@ type Height = Integer
 
 -----------------------------------------------------------------------------
 
-getPixels :: BmpInfoHeader -> BL.ByteString -> [BmpPixel]
-getPixels hdr bs = pixels
+-- TODO: Update this to return actual rows of pixels.
+getPixels :: BmpInfoHeader -> BL.ByteString -> [[BmpPixel]]
+getPixels hdr bs = [pixels] -- TODO: see above TODO.
     where
         width     = fromIntegral $ imageWidth hdr
         height    = fromIntegral $ imageHeight hdr
@@ -257,11 +259,11 @@ type XpmPixel = String -- BLC.ByteString
 -----------------------------------------------------------------------------
 
 makeXpm :: BmpFile -> XpmData
-makeXpm (BmpFile _ _ pixels) = xmap
+makeXpm (BmpFile _ info pixels) = head xmap -- TODO: do this correctly
   where
-    -- width  = fromIntegral $ imageWidth info
-    -- height = fromIntegral $ imageHeight info
-    xmap   = xpmMakeBitmap pixels
+    width  = fromIntegral $ imageWidth info
+    height = fromIntegral $ imageHeight info
+    xmap   = map xpmMakeBitmap pixels
 
 xpmMakeBitmap :: [BmpPixel] -> XpmData
 xpmMakeBitmap pixels = xpmd
