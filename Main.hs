@@ -246,6 +246,9 @@ getPixels hdr bs = [pixels] -- TODO: see above TODO.
         nextBs n  = BL.drop (fromIntegral n) bs
         pixels    = map (runGet readBmpPixel . nextBs) offsets
 
+getRow :: Width -> BL.ByteString -> BmpRow
+getRow height bs = undefined
+
 -----------------------------------------------------------------------------
 
 type XpmData  = BLC.ByteString
