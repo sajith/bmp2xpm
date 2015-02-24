@@ -44,7 +44,7 @@ import           System.Environment    (getArgs, getProgName)
 import           System.FilePath       (replaceExtension)
 import           System.IO
 
-import           Data.Char             (ord)
+import           Data.Char             (chr, ord)
 import           Data.Word             (Word16, Word32, Word8)
 
 import           Data.List             (group, sort)
@@ -234,8 +234,8 @@ getPixels hdr bs = pixels
         width     = fromIntegral $ imageWidth hdr
         height    = fromIntegral $ imageHeight hdr
         offsets   = [0,3.. 3 * (width * height - 1)] :: [Integer]
-        nextOff n = BL.drop (fromIntegral n) bs
-        pixels    = map (runGet readBmpPixel . nextOff) offsets
+        nextBs n = BL.drop (fromIntegral n) bs
+        pixels    = map (runGet readBmpPixel . nextBs) offsets
 
 -----------------------------------------------------------------------------
 
@@ -244,19 +244,20 @@ type XpmData = BLC.ByteString
 -----------------------------------------------------------------------------
 
 makeXpm :: BmpFile -> XpmData
-makeXpm (BmpFile _ info bitmap) = BLC.pack xmap
+makeXpm (BmpFile _ info bitmap) = xmap
   where
     width  = fromIntegral $ imageWidth info
     height = fromIntegral $ imageHeight info
     xmap   = makeXpmBitmap height width bitmap
 
-makeXpmBitmap :: Height -> Width -> [BmpPixel] -> String
-makeXpmBitmap 0 _ _ = ""
-makeXpmBitmap h w b = makeXpmRow w b ++ makeXpmBitmap (h-1) w b
+makeXpmBitmap :: Height -> Width -> [BmpPixel] -> XpmData
+makeXpmBitmap _ _ _ = BLC.pack " " -- undefined
+-- makeXpmBitmap 0 _ _ = ""
+-- makeXpmBitmap h w b = makeXpmRow w b ++ makeXpmBitmap (h-1) w b
 
-makeXpmRow :: (Eq a, Num a) => a -> t -> [Char]
-makeXpmRow w b | w == 0 || w == 1 || w == 2 = "" -- this is padding
-               | otherwise = makeXpmRow (w-1) b
+-- makeXpmRow :: (Eq a, Num a) => a -> t -> [Char]
+-- makeXpmRow w b | w == 0 || w == 1 || w == 2 = "" -- this is padding
+--                | otherwise = makeXpmRow (w-1) b
 
 -----------------------------------------------------------------------------
 
