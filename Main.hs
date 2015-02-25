@@ -242,7 +242,7 @@ getBmpBitmap hdr bs = pixels
   where
     width     = fromIntegral $ imageWidth hdr
     height    = fromIntegral $ imageHeight hdr
-    pixels    = map (\h -> getBmpRow h width bs) [0..height-1]
+    pixels    = map (\h -> getBmpRow h width bs) [0..(height-1)]
 
 getBmpRow :: RowNum -> Width -> BL.ByteString -> BmpRow
 getBmpRow rownum width bs = row
