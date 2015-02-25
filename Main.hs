@@ -106,7 +106,6 @@ instance Eq BmpPixel where
 data CompressionTypes = None | EightBitRL | FourBitRL | RGBBitmapWithMask
                       deriving (Ord, Enum, Show, Read, Eq)
 
--- type BmpBitmap = BL.ByteString
 type BmpRow    = [BmpPixel]
 type BmpBitmap = [BmpRow]
 
