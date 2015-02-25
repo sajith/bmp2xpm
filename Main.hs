@@ -280,8 +280,6 @@ makeXpm name (BmpFile _ info pixels) = BLC.append header xmap -- TODO: do this c
     xmap   = BLC.intercalate (BLC.pack ",\n")
              $ map xpmMakeBitmap pixels
 
-type XpmBodyColors = BLC.ByteString
-
 xpmMakeColorMap :: XpmColorMap -> XpmColors
 xpmMakeColorMap = undefined
 
