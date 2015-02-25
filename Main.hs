@@ -249,11 +249,11 @@ getBmpPixels hdr bs = pixels -- [pixels] -- TODO: see above TODO.
         pixels    = map (\h -> getBmpRow h width bs) [0..height-1]
 
 getBmpRow :: RowNum -> Width -> BL.ByteString -> BmpRow
-getBmpRow rownum width bs = pixels
+getBmpRow rownum width bs = row
   where
     bs'     = BL.drop (fromIntegral (rownum*width)) bs -- row beginning
     offsets = [0,3..width-1]
-    pixels  = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs')) offsets
+    row     = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs')) offsets
     -- pixels  = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs)) offsets
 
 -----------------------------------------------------------------------------
