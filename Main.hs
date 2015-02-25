@@ -237,9 +237,8 @@ type RowNum = Integer
 
 -----------------------------------------------------------------------------
 
--- TODO: Update this to return actual rows of pixels.
 getBmpPixels :: BmpInfoHeader -> BL.ByteString -> [BmpRow]
-getBmpPixels hdr bs = pixels -- [pixels] -- TODO: see above TODO.
+getBmpPixels hdr bs = pixels
     where
         width     = fromIntegral $ imageWidth hdr
         height    = fromIntegral $ imageHeight hdr
