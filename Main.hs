@@ -36,14 +36,15 @@
 module Main where
 
 import           Control.Monad         (unless, when)
-import           Data.Binary.Get       (Get, getWord16le, getWord32le, getWord8,
-                                        runGet)
+
 import           System.Directory      (doesFileExist, getPermissions, readable,
                                         writable)
 import           System.Environment    (getArgs, getProgName)
 import           System.FilePath       (replaceExtension)
 import           System.IO
 
+import           Data.Binary.Get       (Get, getWord16le, getWord32le, getWord8,
+                                        runGet)
 import           Data.Char             (ord)
 import           Data.List             (group, nub)
 import qualified Data.Map              as M
