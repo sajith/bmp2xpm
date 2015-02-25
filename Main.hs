@@ -239,19 +239,22 @@ type RowNum = Integer
 
 -- TODO: Update this to return actual rows of pixels.
 getPixels :: BmpInfoHeader -> BL.ByteString -> [BmpRow]
-getPixels hdr bs = [pixels] -- TODO: see above TODO.
+getPixels hdr bs = pixels -- [pixels] -- TODO: see above TODO.
     where
         width     = fromIntegral $ imageWidth hdr
         height    = fromIntegral $ imageHeight hdr
-        offsets   = [0,3.. 3 * (width * height - 1)] :: [Integer]
-        nextBs n  = BL.drop (fromIntegral n) bs
-        pixels    = map (runGet readBmpPixel . nextBs) offsets
+        -- offsets   = [0,3.. 3 * (width * height - 1)] :: [Integer]
+        -- nextBs n  = BL.drop (fromIntegral n) bs
+        -- pixels    = map (runGet readBmpPixel . nextBs) offsets
+        pixels    = map (\h -> getRow h width bs) [0..height-1]
 
 getRow :: RowNum -> Width -> BL.ByteString -> BmpRow
-getRow row width bs = pixels
+getRow rownum width bs = pixels
   where
-    offsets = [0,3..width-1]
-    pixels  = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs)) offsets
+    bs'     = BL.drop (fromIntegral (rownum*width)) bs
+    offsets = map (\n -> n + (rownum*width)) [0,3..width-1]
+    pixels  = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs')) offsets
+    -- pixels  = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs)) offsets
 
 -----------------------------------------------------------------------------
 
