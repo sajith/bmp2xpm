@@ -252,7 +252,7 @@ getBmpRow :: RowNum -> Width -> BL.ByteString -> BmpRow
 getBmpRow rownum width bs = row
   where
     bs'     = BL.drop (fromIntegral (rownum*width)) bs -- row beginning
-    offsets = [0,3..width-1]
+    offsets = [0,3..(width-1)*3]
     row     = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs')) offsets
     -- pixels  = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs)) offsets
 
