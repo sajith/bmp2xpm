@@ -137,7 +137,9 @@ main = do
 
 showUsage :: String -> IO ()
 showUsage prog = hPutStrLn stderr $
-                 "Usage: " ++ prog ++ " input [output]"
+                 prog ++ " converts BMP files to XMP files.\n\n" ++
+                 "Usage: " ++ prog ++ " input [output]\n\n" ++
+                 "input should be a Windows bitmap file."
 
 -----------------------------------------------------------------------------
 
