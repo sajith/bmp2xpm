@@ -352,7 +352,7 @@ xpmNumColors = 256
 -- TODO: ALL WRONG, REDO.
 xpmFormHeader :: Name -> BmpInfoHeader -> XpmHeader
 xpmFormHeader name info = BLC.pack $
-    "static char *" ++ show name ++ "[] = {\n"
+    "static char *" ++ name ++ "[] = {\n"
     ++ show (imageWidth info) ++ " " ++ show (imageHeight info) ++ " "
     ++ show xpmNumColors ++ " " ++ show xpmCharsPerPixel ++ "\",\n"
     ++ makeXpmColorIndex
