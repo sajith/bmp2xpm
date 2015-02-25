@@ -267,8 +267,8 @@ type XpmPixel = String -- BLC.ByteString
 makeXpm :: BmpFile -> XpmData
 makeXpm (BmpFile _ info pixels) = head xmap -- TODO: do this correctly
   where
-    width  = fromIntegral $ imageWidth info
-    height = fromIntegral $ imageHeight info
+    -- width  = fromIntegral $ imageWidth info
+    -- height = fromIntegral $ imageHeight info
     xmap   = map xpmMakeBitmap pixels
 
 xpmMakeBitmap :: [BmpPixel] -> XpmData
