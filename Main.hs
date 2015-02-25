@@ -262,8 +262,9 @@ getBmpRow rownum width bs = row
 
 -----------------------------------------------------------------------------
 
-type XpmData  = BLC.ByteString
-type XpmPixel = String -- BLC.ByteString
+type XpmColors = BLC.ByteString
+type XpmData   = BLC.ByteString
+type XpmPixel  = String -- BLC.ByteString
 
 -----------------------------------------------------------------------------
 
@@ -278,6 +279,11 @@ makeXpm name (BmpFile _ info pixels) = BLC.append header xmap -- TODO: do this c
     header = xpmFormHeader name info
     xmap   = BLC.intercalate (BLC.pack ",\n")
              $ map xpmMakeBitmap pixels
+
+type XpmBodyColors = BLC.ByteString
+
+xpmMakeColorMap :: XpmColorMap -> XpmColors
+xpmMakeColorMap = undefined
 
 xpmMakeBitmap :: [BmpPixel] -> XpmData
 xpmMakeBitmap pixels = xpmd
