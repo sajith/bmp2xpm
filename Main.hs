@@ -323,7 +323,7 @@ xpmIndices :: [String]
 xpmIndices = oneLetters ++ twoLetters xpmChrRange
   where
     oneLetters = group xpmChrRange
-
+    -- TODO: rewrite this.
     twoLetters :: String -> [String]
     twoLetters []     = group ""
     twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
