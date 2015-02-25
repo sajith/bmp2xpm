@@ -276,7 +276,7 @@ xpmMakeBitmap :: [BmpPixel] -> XpmData
 xpmMakeBitmap pixels = xpmd
   where
     cmap = makeColorMap $ nub pixels
-    xpmd = BLC.pack $ concatMap (\p -> translatePixel cmap p) pixels
+    xpmd = BLC.pack $ concatMap (translatePixel cmap) pixels
 
 translatePixel :: XpmColorMap -> BmpPixel -> XpmPixel
 translatePixel m p = case M.lookup p m of
