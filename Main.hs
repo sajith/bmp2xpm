@@ -40,7 +40,7 @@ import           Control.Monad         (unless, when)
 import           System.Directory      (doesFileExist, getPermissions, readable,
                                         writable)
 import           System.Environment    (getArgs, getProgName)
-import           System.FilePath       (replaceExtension)
+import           System.FilePath       (replaceExtension, takeBaseName)
 import           System.IO
 
 import           Data.Binary.Get       (Get, getWord16le, getWord32le, getWord8,
@@ -174,6 +174,8 @@ process infile outfile = do
     e2 <- isFileWritable outfile
     unless e2 $ error $ "Can't write to output file " ++ show outfile
 
+    let name = takeBaseName infile
+
     withBinaryFile infile ReadMode
         (\inh -> withFile outfile WriteMode
            (\outh -> do
@@ -183,7 +185,7 @@ process infile outfile = do
 
                  hSetNewlineMode outh NewlineMode{ inputNL = LF,
                                                    outputNL = LF }
-                 runConversion inh outh))
+                 runConversion name inh outh))
 
     -- withFile infile ReadMode
     --     (withFile outfile WriteMode . runConversion)
@@ -192,8 +194,12 @@ process infile outfile = do
 
 -----------------------------------------------------------------------------
 
-runConversion :: Handle -> Handle -> IO ()
-runConversion bmpHandle xpmHandle = do
+type Name = String
+
+-----------------------------------------------------------------------------
+
+runConversion :: Name -> Handle -> Handle -> IO ()
+runConversion name bmpHandle xpmHandle = do
 
     putStrLn "running..."
 
@@ -226,7 +232,7 @@ runConversion bmpHandle xpmHandle = do
     when (compression bmpinfo /= 0) $
         error "Can't run conversion: I don't know how to handle compressed bitmaps."
 
-    let xpmdata = makeXpm bmpdata
+    let xpmdata = makeXpm name bmpdata
     putStrLn$ "Xpm conversion result size: " ++ show (BLC.length xpmdata)
 
     writeXpmFile xpmHandle xpmdata
@@ -266,12 +272,14 @@ type XpmPixel = String -- BLC.ByteString
 
 -----------------------------------------------------------------------------
 
-makeXpm :: BmpFile -> XpmData
-makeXpm (BmpFile _ info pixels) = head xmap -- TODO: do this correctly
+makeXpm :: Name -> BmpFile -> XpmData
+makeXpm name (BmpFile _ info pixels) = BLC.append header xmap -- TODO: do this correctly
   where
     -- width  = fromIntegral $ imageWidth info
     -- height = fromIntegral $ imageHeight info
-    xmap   = map xpmMakeBitmap pixels
+    header = xpmFormHeader name info
+    xmap   = BLC.intercalate (BLC.pack ",\n")
+             $ map xpmMakeBitmap pixels
 
 xpmMakeBitmap :: [BmpPixel] -> XpmData
 xpmMakeBitmap pixels = xpmd
@@ -331,9 +339,9 @@ xpmIndices = oneLetters ++ twoLetters xpmChrRange
 
 -----------------------------------------------------------------------------
 
-type BmpBody   = BL.ByteString
-type XpmHeader = BL.ByteString
-type XpmBody   = BL.ByteString
+type BmpBody   = BLC.ByteString
+type XpmHeader = BLC.ByteString
+type XpmBody   = BLC.ByteString
 
 -----------------------------------------------------------------------------
 
@@ -343,11 +351,9 @@ xpmCharsPerPixel = 2
 xpmNumColors :: Integer
 xpmNumColors = 256
 
-type XpmName = String
-
 -- TODO: ALL WRONG, REDO.
-xpmFormHeader :: XpmName -> BmpInfoHeader -> String
-xpmFormHeader name info = -- BL.pack $
+xpmFormHeader :: Name -> BmpInfoHeader -> XpmHeader
+xpmFormHeader name info = BLC.pack $
     "static char *" ++ show name ++ "[] = {\n"
     ++ show (imageWidth info) ++ " " ++ show (imageHeight info) ++ " "
     ++ show xpmNumColors ++ " " ++ show xpmCharsPerPixel ++ "\",\n"
