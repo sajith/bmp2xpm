@@ -203,7 +203,7 @@ runConversion bmpHandle xpmHandle = do
         bmpinfo = runGet readBmpInfoHeader $ BL.drop infoOff contents
         bodyOff = fromInteger bmpFileHeaderSize + fromIntegral (infoHeaderSize bmpinfo)
         bmpbody = BL.drop bodyOff contents
-        pixels  = getBmpPixels bmpinfo bmpbody
+        pixels  = getBmpBitmap bmpinfo bmpbody
         bmpdata = BmpFile bmphdr bmpinfo pixels
 
     when (fileType bmphdr /= bmpFileType) $
@@ -237,8 +237,8 @@ type RowNum = Integer
 
 -----------------------------------------------------------------------------
 
-getBmpPixels :: BmpInfoHeader -> BL.ByteString -> [BmpRow]
-getBmpPixels hdr bs = pixels
+getBmpBitmap :: BmpInfoHeader -> BL.ByteString -> BmpBitmap
+getBmpBitmap hdr bs = pixels
   where
     width     = fromIntegral $ imageWidth hdr
     height    = fromIntegral $ imageHeight hdr
