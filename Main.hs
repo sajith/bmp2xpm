@@ -233,11 +233,12 @@ runConversion bmpHandle xpmHandle = do
 
 type Width  = Integer
 type Height = Integer
+type RowNum = Integer
 
 -----------------------------------------------------------------------------
 
 -- TODO: Update this to return actual rows of pixels.
-getPixels :: BmpInfoHeader -> BL.ByteString -> [[BmpPixel]]
+getPixels :: BmpInfoHeader -> BL.ByteString -> [BmpRow]
 getPixels hdr bs = [pixels] -- TODO: see above TODO.
     where
         width     = fromIntegral $ imageWidth hdr
@@ -246,8 +247,11 @@ getPixels hdr bs = [pixels] -- TODO: see above TODO.
         nextBs n  = BL.drop (fromIntegral n) bs
         pixels    = map (runGet readBmpPixel . nextBs) offsets
 
-getRow :: Width -> BL.ByteString -> BmpRow
-getRow height bs = undefined
+getRow :: RowNum -> Width -> BL.ByteString -> BmpRow
+getRow row width bs = pixels
+  where
+    offsets = [0,3..width-1]
+    pixels  = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs)) offsets
 
 -----------------------------------------------------------------------------
 
