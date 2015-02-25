@@ -203,7 +203,7 @@ runConversion bmpHandle xpmHandle = do
         bmpinfo = runGet readBmpInfoHeader $ BL.drop infoOff contents
         bodyOff = fromInteger bmpFileHeaderSize + fromIntegral (infoHeaderSize bmpinfo)
         bmpbody = BL.drop bodyOff contents
-        pixels  = getPixels bmpinfo bmpbody
+        pixels  = getBmpPixels bmpinfo bmpbody
         bmpdata = BmpFile bmphdr bmpinfo pixels
 
     when (fileType bmphdr /= bmpFileType) $
@@ -238,21 +238,21 @@ type RowNum = Integer
 -----------------------------------------------------------------------------
 
 -- TODO: Update this to return actual rows of pixels.
-getPixels :: BmpInfoHeader -> BL.ByteString -> [BmpRow]
-getPixels hdr bs = pixels -- [pixels] -- TODO: see above TODO.
+getBmpPixels :: BmpInfoHeader -> BL.ByteString -> [BmpRow]
+getBmpPixels hdr bs = pixels -- [pixels] -- TODO: see above TODO.
     where
         width     = fromIntegral $ imageWidth hdr
         height    = fromIntegral $ imageHeight hdr
         -- offsets   = [0,3.. 3 * (width * height - 1)] :: [Integer]
         -- nextBs n  = BL.drop (fromIntegral n) bs
         -- pixels    = map (runGet readBmpPixel . nextBs) offsets
-        pixels    = map (\h -> getRow h width bs) [0..height-1]
+        pixels    = map (\h -> getBmpRow h width bs) [0..height-1]
 
-getRow :: RowNum -> Width -> BL.ByteString -> BmpRow
-getRow rownum width bs = pixels
+getBmpRow :: RowNum -> Width -> BL.ByteString -> BmpRow
+getBmpRow rownum width bs = pixels
   where
-    bs'     = BL.drop (fromIntegral (rownum*width)) bs
-    offsets = map (\n -> n + (rownum*width)) [0,3..width-1]
+    bs'     = BL.drop (fromIntegral (rownum*width)) bs -- row beginning
+    offsets = [0,3..width-1]
     pixels  = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs')) offsets
     -- pixels  = map (\o -> runGet readBmpPixel (BL.drop (fromIntegral o) bs)) offsets
 
