@@ -114,13 +114,13 @@ data BmpFile = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
 
 -----------------------------------------------------------------------------
 
+-- | BMP file header is 14 bytes.
 bmpFileHeaderSize :: Integer
 bmpFileHeaderSize = 14
 
--- | BMP filetype magic
+-- | BMP filetype magic (0x4d42, or 19778 in decimal)
 bmpFileType :: Word16
 bmpFileType = toEnum $ ord 'M' * 256 + ord 'B'
--- bmpFileType = 0x4d42 -- 19778 in decimal.
 
 -----------------------------------------------------------------------------
 
