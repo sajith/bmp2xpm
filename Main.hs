@@ -275,8 +275,6 @@ type XpmPixel = String -- BLC.ByteString
 makeXpm :: Name -> BmpFile -> XpmData
 makeXpm name (BmpFile _ info pixels) = BLC.append header xmap -- TODO: do this correctly
   where
-    -- width  = fromIntegral $ imageWidth info
-    -- height = fromIntegral $ imageHeight info
     header = xpmFormHeader name info
     xmap   = BLC.intercalate (BLC.pack ",\n")
              $ map xpmMakeBitmap pixels
