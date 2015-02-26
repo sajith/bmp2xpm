@@ -181,14 +181,7 @@ process infile outfile = do
 
     withBinaryFile infile ReadMode
         (\inh -> withFile outfile WriteMode
-           (\outh -> do
-                 size <- hFileSize inh
-                 when (size < bmpFileHeaderSize) $
-                    error "Input file is too small to be a bitmap file."
-
-                 hSetNewlineMode outh NewlineMode{ inputNL = LF,
-                                                   outputNL = LF }
-                 runConversion name inh outh))
+           (\outh -> runConversion name inh outh))
 
     -- withFile infile ReadMode
     --     (withFile outfile WriteMode . runConversion)
@@ -201,10 +194,20 @@ type Name = String
 
 -----------------------------------------------------------------------------
 
+checkFileSize :: Handle -> IO ()
+checkFileSize inh = do
+    size <- hFileSize inh
+    when (size < bmpFileHeaderSize) $
+        error "Input file is too small to be a bitmap file."
+
+-----------------------------------------------------------------------------
+
 runConversion :: Name -> Handle -> Handle -> IO ()
 runConversion name bmpHandle xpmHandle = do
 
     putStrLn "running..."
+
+    checkFileSize bmpHandle
 
     contents <- BL.hGetContents bmpHandle
 
