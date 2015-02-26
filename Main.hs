@@ -310,11 +310,11 @@ xpmMakeBitmap bmprows = (cmap, xmap)
     cmap = makeColorMap $ nub (concat bmprows)
     -- xpmd = BLC.pack $ concatMap (translatePixel cmap) pixels
     -- rows = map (translatePixel cmap) pixels
-    xpmrows = map quote $ map (translateRow cmap) bmprows
+    xpmrows = map (quote . translateRow cmap) bmprows
     xmap = BLC.intercalate (BLC.pack ",\n") xpmrows
 
 translateRow :: XpmColorMap -> BmpRow -> XpmRow
-translateRow cmap row = BLC.pack $ concatMap (\p -> translatePixel cmap p) row
+translateRow cmap row = BLC.pack $ concatMap (translatePixel cmap) row
 
 translatePixel :: XpmColorMap -> BmpPixel -> XpmPixel
 translatePixel m p = case M.lookup p m of
