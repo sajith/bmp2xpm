@@ -46,7 +46,7 @@ import           System.IO
 import           Data.Binary.Get       (Get, getWord16le, getWord32le, getWord8,
                                         runGet)
 import           Data.Char             (ord)
-import           Data.List             (group, nub)
+import           Data.List             (group, nub, sort)
 import qualified Data.Map              as M
 import           Data.Word             (Word16, Word32, Word8)
 
@@ -301,7 +301,7 @@ xpmMakeColorMap cmap = rows
     -- assocs = M.toList cmap
     assocs = M.assocs cmap
     -- rows   = BLC.intercalate (BLC.pack ",\n") (map translateColor assocs)
-    rows   = BLC.concat $ map translateColor assocs
+    rows   = BLC.concat $ sort $ map translateColor assocs
 
 -- TODO: fix this.
 translateColor :: (BmpPixel, XpmIndex) -> XpmColor
