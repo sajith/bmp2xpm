@@ -298,11 +298,15 @@ makeXpm name (BmpFile _ info pixels) = xpmdata -- TODO: do this correctly
 xpmMakeColorMap :: XpmColorMap -> XpmColors
 xpmMakeColorMap cmap = rows
   where
-    assocs = M.toList cmap
-    rows   = BLC.intercalate (BLC.pack ",\n") (map translateColor assocs)
+    -- assocs = M.toList cmap
+    assocs = M.assocs cmap
+    -- rows   = BLC.intercalate (BLC.pack ",\n") (map translateColor assocs)
+    rows   = BLC.concat $ map translateColor assocs
 
+-- TODO: fix this.
 translateColor :: (BmpPixel, XpmIndex) -> XpmColor
-translateColor (b, c) = BLC.pack $ show (c ++ " c " ++ toXpmColor b)
+translateColor (b, c) = BLC.pack $ printf "\"%s c %s\",\n" c (toXpmColor b)
+                        -- show (c ++ " c " ++ toXpmColor b)
 
 xpmMakeBitmap :: BmpBitmap -> (XpmColorMap, XpmBitmap)
 xpmMakeBitmap bmprows = (cmap, xmap)
