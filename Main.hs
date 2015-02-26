@@ -307,7 +307,8 @@ makeXpm name (BmpFile _ info pixels) = xpmdata -- TODO: do this correctly
     (cmap, xmap) = xpmMakeBitmap pixels
     xpmColors    = xpmMakeColorMap cmap
     xpmheader    = BLC.append header xpmColors
-    xpmdata      = BLC.append xpmheader xmap
+    xpmbody      = BLC.append xpmheader xmap
+    xpmdata      = BLC.append xpmbody (BLC.pack "\n};")
 
 -----------------------------------------------------------------------------
 
