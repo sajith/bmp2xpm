@@ -355,8 +355,9 @@ type XpmColorMap = M.Map BmpPixel XpmIndex
 -- toXpmColor :: BmpPixel -> XpmColor
 -- toXpmColor (BmpPixel r g b) = BLC.pack $ printf "#%02x%02x%02x" r g b
 
+-- TODO: this translation is incorrect, fix.
 toXpmColor :: BmpPixel -> String
-toXpmColor (BmpPixel r g b) = printf "#%02x%02x%02x" r g b
+toXpmColor (BmpPixel r g b) = printf "#%02X%02X%02X" r g b
 
 -----------------------------------------------------------------------------
 
