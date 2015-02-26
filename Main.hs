@@ -203,6 +203,14 @@ checkFileSize inh = do
 
 -----------------------------------------------------------------------------
 
+-- TODO: temporary debugging function, remove this.
+showRows :: BmpFile -> IO ()
+showRows (BmpFile _ _ pixels) = mapM_ showLength pixels
+  where
+    showLength x = putStrLn$ "length: " ++ show (length x)
+
+-----------------------------------------------------------------------------
+
 runConversion :: Name -> Handle -> Handle -> IO ()
 runConversion name bmpHandle xpmHandle = do
 
@@ -230,6 +238,8 @@ runConversion name bmpHandle xpmHandle = do
 
     putStrLn$ "Read " ++ show (length pixels) ++ " pixels ("
             ++ show (3 * length pixels) ++ " bytes)"
+
+    showRows bmpdata
 
     when (bitsPerPixel bmpinfo /= bmpColorDepthSupported) $
         error $ "Can't run conversion: I don't know how to handle "
