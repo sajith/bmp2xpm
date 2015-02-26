@@ -262,9 +262,12 @@ getBmpRow rownum width bs = row
 
 -----------------------------------------------------------------------------
 
+type XpmColor  = BLC.ByteString -- format: "xx c #xxxxxx"
 type XpmColors = BLC.ByteString
-type XpmData   = BLC.ByteString
+type XpmBitmap = BLC.ByteString
 type XpmPixel  = String -- BLC.ByteString
+type XpmRow    = BLC.ByteString
+type XpmData   = BLC.ByteString -- = XpmHeader + XpmColors + [XpmRow] + XpmTail
 
 -----------------------------------------------------------------------------
 
@@ -273,21 +276,45 @@ type XpmPixel  = String -- BLC.ByteString
 
 -----------------------------------------------------------------------------
 
+quote :: BLC.ByteString -> BLC.ByteString
+quote bs = BLC.snoc (BLC.cons dq bs) dq
+           where dq = '\"'
+
+-----------------------------------------------------------------------------
+
 makeXpm :: Name -> BmpFile -> XpmData
-makeXpm name (BmpFile _ info pixels) = BLC.append header xmap -- TODO: do this correctly
+makeXpm name (BmpFile _ info pixels) = xpmdata -- TODO: do this correctly
   where
-    header = xpmFormHeader name info
-    xmap   = BLC.intercalate (BLC.pack ",\n")
-             $ map xpmMakeBitmap pixels
+    header       = xpmFormHeader name info
+    -- xmap      = BLC.intercalate (BLC.pack ",\n")
+    --          $ map xpmMakeBitmap pixels
+    (cmap, xmap) = xpmMakeBitmap pixels
+    xpmColors    = xpmMakeColorMap cmap
+    xpmheader    = BLC.append header xpmColors
+    xpmdata      = BLC.append xpmheader xmap
+
+-- type XpmColorMap = M.Map BmpPixel XpmIndex
 
 xpmMakeColorMap :: XpmColorMap -> XpmColors
-xpmMakeColorMap = undefined
-
-xpmMakeBitmap :: [BmpPixel] -> XpmData
-xpmMakeBitmap pixels = xpmd
+xpmMakeColorMap cmap = rows
   where
-    cmap = makeColorMap $ nub pixels
-    xpmd = BLC.pack $ concatMap (translatePixel cmap) pixels
+    assocs = M.toList cmap
+    rows   = BLC.intercalate (BLC.pack ",\n") (map translateColor assocs)
+
+translateColor :: (BmpPixel, XpmIndex) -> XpmColor
+translateColor (b, c) = BLC.pack $ show (c ++ " c " ++ toXpmColor b)
+
+xpmMakeBitmap :: BmpBitmap -> (XpmColorMap, XpmBitmap)
+xpmMakeBitmap bmprows = (cmap, xmap)
+  where
+    cmap = makeColorMap $ nub (concat bmprows)
+    -- xpmd = BLC.pack $ concatMap (translatePixel cmap) pixels
+    -- rows = map (translatePixel cmap) pixels
+    xpmrows = map quote $ map (translateRow cmap) bmprows
+    xmap = BLC.intercalate (BLC.pack ",\n") xpmrows
+
+translateRow :: XpmColorMap -> BmpRow -> XpmRow
+translateRow cmap row = BLC.pack $ concatMap (\p -> translatePixel cmap p) row
 
 translatePixel :: XpmColorMap -> BmpPixel -> XpmPixel
 translatePixel m p = case M.lookup p m of
@@ -296,12 +323,16 @@ translatePixel m p = case M.lookup p m of
 
 -----------------------------------------------------------------------------
 
-type XpmColor    = String
-type XpmColorMap = M.Map BmpPixel XpmColor
+-- type XpmColor    = String
+type XpmIndex    = String
+type XpmColorMap = M.Map BmpPixel XpmIndex
 
 -----------------------------------------------------------------------------
 
-toXpmColor :: BmpPixel -> XpmColor
+-- toXpmColor :: BmpPixel -> XpmColor
+-- toXpmColor (BmpPixel r g b) = BLC.pack $ printf "#%02x%02x%02x" r g b
+
+toXpmColor :: BmpPixel -> String
 toXpmColor (BmpPixel r g b) = printf "#%02x%02x%02x" r g b
 
 -----------------------------------------------------------------------------
@@ -330,7 +361,7 @@ xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
 --     twoLetters []     = group ""
 --     twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
 
-xpmIndices :: [String]
+xpmIndices :: [XpmIndex]
 xpmIndices = oneLetters ++ twoLetters xpmChrRange
   where
     oneLetters = group xpmChrRange
