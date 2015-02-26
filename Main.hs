@@ -309,7 +309,7 @@ makeXpm name (BmpFile _ info pixels) = xpmdata -- TODO: do this correctly
     xpmheader    = BLC.append header xpmColors
     xpmdata      = BLC.append xpmheader xmap
 
--- type XpmColorMap = M.Map BmpPixel XpmIndex
+-----------------------------------------------------------------------------
 
 xpmMakeColorMap :: XpmColorMap -> XpmColors
 xpmMakeColorMap cmap = rows
@@ -320,6 +320,8 @@ xpmMakeColorMap cmap = rows
 
 translateColor :: (BmpPixel, XpmIndex) -> XpmColor
 translateColor (b, c) = BLC.pack $ printf "\"%s c %s\",\n" c (toXpmColor b)
+
+-----------------------------------------------------------------------------
 
 xpmMakeBitmap :: BmpBitmap -> (XpmColorMap, XpmBitmap)
 xpmMakeBitmap bmprows = (cmap, xmap)
