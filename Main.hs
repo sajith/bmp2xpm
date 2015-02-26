@@ -308,10 +308,8 @@ xpmMakeColorMap cmap = rows
     assocs = M.assocs cmap
     rows   = BLC.concat $ sort $ map translateColor assocs
 
--- TODO: fix this.
 translateColor :: (BmpPixel, XpmIndex) -> XpmColor
 translateColor (b, c) = BLC.pack $ printf "\"%s c %s\",\n" c (toXpmColor b)
-                        -- show (c ++ " c " ++ toXpmColor b)
 
 xpmMakeBitmap :: BmpBitmap -> (XpmColorMap, XpmBitmap)
 xpmMakeBitmap bmprows = (cmap, xmap)
