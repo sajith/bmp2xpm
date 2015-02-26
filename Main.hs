@@ -388,7 +388,6 @@ xpmCharsPerPixel = 2
 xpmNumColors :: Integer
 xpmNumColors = 256
 
--- TODO: ALL WRONG, REDO.
 xpmFormHeader :: Name -> BmpInfoHeader -> XpmHeader
 xpmFormHeader name info = BLC.pack $
     "/* XPM */\n"
