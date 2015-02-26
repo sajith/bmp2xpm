@@ -392,7 +392,7 @@ xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
 xpmIndices :: [XpmIndex]
 xpmIndices = oneLetters ++ filter (/= "##") (twoLetters xpmChrRange)
   where
-    oneLetters = group $ xpmChrRange
+    oneLetters = group xpmChrRange
     -- TODO: rewrite this.
     twoLetters :: String -> [String]
     twoLetters []     = group ""
