@@ -124,6 +124,12 @@ bmpFileHeaderSize = 14
 bmpFileType :: Word16
 bmpFileType = toEnum $ ord 'M' * 256 + ord 'B'
 
+bmpCompressionSupported :: Word32
+bmpCompressionSupported = 0
+
+bmpColorDepthSupported :: Word16
+bmpColorDepthSupported = 24
+
 -----------------------------------------------------------------------------
 
 main :: IO ()
@@ -227,11 +233,11 @@ runConversion name bmpHandle xpmHandle = do
             ++ show (3 * length pixels) ++ " bytes)"
 
     let bpp = bitsPerPixel bmpinfo
-    when (bpp /= 24) $
+    when (bpp /= bmpColorDepthSupported) $
         error $ "Can't run conversion: I don't know how to handle "
                 ++ show bpp ++ "-bit pixels."
 
-    when (compression bmpinfo /= 0) $
+    when (compression bmpinfo /= bmpCompressionSupported) $
         error "Can't run conversion: I don't know how to handle compressed bitmaps."
 
     let xpmdata = makeXpm name bmpdata
