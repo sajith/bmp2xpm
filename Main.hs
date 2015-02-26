@@ -342,7 +342,8 @@ translateRow cmap row = BLC.pack $ concatMap (translatePixel cmap) row
 translatePixel :: XpmColorMap -> BmpPixel -> XpmPixel
 translatePixel m p = case M.lookup p m of
                Just c  -> c ++ " "
-               Nothing -> ""
+               Nothing -> "## "
+
 
 -----------------------------------------------------------------------------
 
@@ -363,7 +364,9 @@ toXpmColor (BmpPixel r g b) = printf "#%02X%02X%02X" r g b
 
 -- TODO: this makes an incorrect map, fix.
 makeColorMap :: [BmpPixel] -> XpmColorMap
-makeColorMap pixels = M.fromList $ zip pixels xpmIndices
+makeColorMap pixels = M.fromList $
+                      (BmpPixel{red=255,blue=255,green=255}, "##") :
+                      zip pixels xpmIndices
 
 -----------------------------------------------------------------------------
 
@@ -387,9 +390,9 @@ xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
 --     twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
 
 xpmIndices :: [XpmIndex]
-xpmIndices = oneLetters ++ twoLetters xpmChrRange
+xpmIndices = oneLetters ++ filter (/= "##") (twoLetters xpmChrRange)
   where
-    oneLetters = group xpmChrRange
+    oneLetters = group $ xpmChrRange
     -- TODO: rewrite this.
     twoLetters :: String -> [String]
     twoLetters []     = group ""
