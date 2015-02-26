@@ -180,11 +180,7 @@ process infile outfile = do
     let name = takeBaseName infile
 
     withBinaryFile infile ReadMode
-        (\inh -> withFile outfile WriteMode
-           (\outh -> runConversion name inh outh))
-
-    -- withFile infile ReadMode
-    --     (withFile outfile WriteMode . runConversion)
+        (withFile outfile WriteMode . runConversion name)
 
     putStrLn $ infile ++ " -> " ++ outfile ++ " conversion done."
 
