@@ -361,6 +361,7 @@ toXpmColor (BmpPixel r g b) = printf "#%02X%02X%02X" r g b
 
 -----------------------------------------------------------------------------
 
+-- TODO: this makes an incorrect map, fix.
 makeColorMap :: [BmpPixel] -> XpmColorMap
 makeColorMap pixels = M.fromList $ zip pixels xpmIndices
 
