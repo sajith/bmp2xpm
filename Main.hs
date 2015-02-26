@@ -59,7 +59,7 @@ import qualified Data.ByteString.Lazy  as BL
 
 -- BMP version 3.x data types.
 
--- The 14 byte BMP file header.
+-- | The 14 byte BMP file header.
 data BmpFileHeader = BmpFileHeader {
       fileType  :: Word16 -- Magic identifier. Should be "BM" (0x4d42).
     , fileSize  :: Word32 -- File size in bytes.
@@ -68,7 +68,17 @@ data BmpFileHeader = BmpFileHeader {
     , offset    :: Word32 -- Offset to image data, in bytes.
     } deriving Show
 
--- The 14-byte BMP file is followed by this "info" header.
+-- | The 14-byte BMP file is followed by this "info" header.
+--
+-- 'compression' field can have the following values:
+--
+--   0 - no compression
+--   1 - 8-bit run length encoding
+--   2 - 4-bit run length encoding
+--   3 - RGB bitmap with mask
+--
+-- Only uncompressed BMP files are supported.
+--
 data BmpInfoHeader = BmpInfoHeader {
       infoHeaderSize  :: Word32 -- Size of info header, in bytes.
     , imageWidth      :: Word32 -- Width of image, in pixels. u32.
@@ -83,32 +93,25 @@ data BmpInfoHeader = BmpInfoHeader {
     , colorsImportant :: Word32 -- Min. number of important colors.
     } deriving Show
 
+-- | Pixel representation for uncompressed BMP files.
 data BmpPixel = BmpPixel {
       red   :: Word8
     , green :: Word8
     , blue  :: Word8
     } deriving (Show, Ord)
 
+-- | Need this to 'nub' the pixel array.
 instance Eq BmpPixel where
     (==) (BmpPixel r g b) (BmpPixel x y z) = r == x && g == y && b == z
     (/=) a b = not $ (==) a b
 
--- |
--- Compression types that can be present in a BMP file.
---
---   0 - no compression
---   1 - 8-bit run length encoding
---   2 - 4-bit run length encoding
---   3 - RGB bitmap with mask
---
--- Only None is supported.
---
-data CompressionTypes = None | EightBitRL | FourBitRL | RGBBitmapWithMask
-                      deriving (Ord, Enum, Show, Read, Eq)
-
+-- | Pixels are laid out in rows.
 type BmpRow    = [BmpPixel]
+
+-- | Bitmap data is a row of rows.
 type BmpBitmap = [BmpRow]
 
+-- | And voila!  We have a BMP file.
 data BmpFile = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
 
 -----------------------------------------------------------------------------
