@@ -306,7 +306,6 @@ xpmMakeColorMap cmap = rows
   where
     -- assocs = M.toList cmap
     assocs = M.assocs cmap
-    -- rows   = BLC.intercalate (BLC.pack ",\n") (map translateColor assocs)
     rows   = BLC.concat $ sort $ map translateColor assocs
 
 -- TODO: fix this.
