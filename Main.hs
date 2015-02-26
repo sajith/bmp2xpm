@@ -334,6 +334,11 @@ xpmMakeBitmap bmprows = (cmap, xmap)
 translateRow :: XpmColorMap -> BmpRow -> XpmRow
 translateRow cmap row = BLC.pack $ concatMap (translatePixel cmap) row
 
+-- TODO: Remove debug stuff
+-- translateRow :: XpmColorMap -> BmpRow -> XpmRow
+-- translateRow cmap row = BLC.pack $ (show $ length row) ++ " " ++ row'
+--   where row' = concatMap (translatePixel cmap) row
+
 translatePixel :: XpmColorMap -> BmpPixel -> XpmPixel
 translatePixel m p = case M.lookup p m of
                Just c  -> c ++ " "
