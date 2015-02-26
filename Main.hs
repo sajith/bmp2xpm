@@ -316,9 +316,9 @@ translateColor (b, c) = BLC.pack $ printf "\"%s c %s\",\n" c (toXpmColor b)
 xpmMakeBitmap :: BmpBitmap -> (XpmColorMap, XpmBitmap)
 xpmMakeBitmap bmprows = (cmap, xmap)
   where
-    cmap = makeColorMap $ nub (concat bmprows)
+    cmap    = makeColorMap $ nub (concat bmprows)
     xpmrows = map (quote . translateRow cmap) bmprows
-    xmap = BLC.intercalate (BLC.pack ",\n") xpmrows
+    xmap    = BLC.intercalate (BLC.pack ",\n") xpmrows
 
 translateRow :: XpmColorMap -> BmpRow -> XpmRow
 translateRow cmap row = BLC.pack $ concatMap (translatePixel cmap) row
