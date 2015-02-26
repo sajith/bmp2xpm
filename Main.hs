@@ -412,8 +412,8 @@ xpmNumColors = 256
 xpmFormHeader :: Name -> BmpInfoHeader -> XpmHeader
 xpmFormHeader name info = BLC.pack $
     "/* XPM */\n"
-    ++ "static char *" ++ name ++ "[] = {\n\""
-    ++ "/* columns rows colors chars-per-pixel */\n"
+    ++ "static char *" ++ name ++ "[] = {\n"
+    ++ "/* columns rows colors chars-per-pixel */\n\""
     ++ show (imageWidth info) ++ " " ++ show (imageHeight info) ++ " "
     ++ show xpmNumColors ++ " " ++ show xpmCharsPerPixel ++ "\",\n"
 
