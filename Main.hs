@@ -396,11 +396,6 @@ xpmFormHeader name info = BLC.pack $
     ++ "/* columns rows colors chars-per-pixel */\n"
     ++ show (imageWidth info) ++ " " ++ show (imageHeight info) ++ " "
     ++ show xpmNumColors ++ " " ++ show xpmCharsPerPixel ++ "\",\n"
-    ++ makeXpmColorIndex
-
--- TODO: ALL WRONG, REDO.
-makeXpmColorIndex :: String
-makeXpmColorIndex = ""
 
 -----------------------------------------------------------------------------
 
