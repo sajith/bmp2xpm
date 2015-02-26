@@ -69,16 +69,6 @@ data BmpFileHeader = BmpFileHeader {
     } deriving Show
 
 -- | The 14-byte BMP file is followed by this "info" header.
---
--- 'compression' field can have the following values:
---
---   0 - no compression
---   1 - 8-bit run length encoding
---   2 - 4-bit run length encoding
---   3 - RGB bitmap with mask
---
--- Only uncompressed BMP files are supported.
---
 data BmpInfoHeader = BmpInfoHeader {
       infoHeaderSize  :: Word32 -- Size of info header, in bytes.
     , imageWidth      :: Word32 -- Width of image, in pixels. u32.
@@ -124,9 +114,18 @@ bmpFileHeaderSize = 14
 bmpFileType :: Word16
 bmpFileType = toEnum $ ord 'M' * 256 + ord 'B'
 
+-- | 'compression' field of info header can have the following values:
+--
+--   0 - no compression
+--   1 - 8-bit run length encoding
+--   2 - 4-bit run length encoding
+--   3 - RGB bitmap with mask
+--
+-- Only uncompressed BMP files are supported.
 bmpCompressionSupported :: Word32
 bmpCompressionSupported = 0
 
+-- | Only 24-bit pixels are supported.
 bmpColorDepthSupported :: Word16
 bmpColorDepthSupported = 24
 
@@ -232,10 +231,9 @@ runConversion name bmpHandle xpmHandle = do
     putStrLn$ "Read " ++ show (length pixels) ++ " pixels ("
             ++ show (3 * length pixels) ++ " bytes)"
 
-    let bpp = bitsPerPixel bmpinfo
-    when (bpp /= bmpColorDepthSupported) $
+    when (bitsPerPixel bmpinfo /= bmpColorDepthSupported) $
         error $ "Can't run conversion: I don't know how to handle "
-                ++ show bpp ++ "-bit pixels."
+                ++ show (bitsPerPixel bmpinfo) ++ "-bit pixels."
 
     when (compression bmpinfo /= bmpCompressionSupported) $
         error "Can't run conversion: I don't know how to handle compressed bitmaps."
