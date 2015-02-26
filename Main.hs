@@ -317,8 +317,6 @@ xpmMakeBitmap :: BmpBitmap -> (XpmColorMap, XpmBitmap)
 xpmMakeBitmap bmprows = (cmap, xmap)
   where
     cmap = makeColorMap $ nub (concat bmprows)
-    -- xpmd = BLC.pack $ concatMap (translatePixel cmap) pixels
-    -- rows = map (translatePixel cmap) pixels
     xpmrows = map (quote . translateRow cmap) bmprows
     xmap = BLC.intercalate (BLC.pack ",\n") xpmrows
 
