@@ -302,8 +302,8 @@ makeXpm :: Name -> BmpFile -> XpmData
 makeXpm name (BmpFile _ info pixels) = xpmdata -- TODO: do this correctly
   where
     header       = xpmFormHeader name info
-    xmap         = BLC.pack $ xpmMakeBitmap2 pixels
-    xpmColors    = BLC.pack $ concat xpmColorLines
+    xmap         = xpmMakeBitmap2 pixels
+    xpmColors    = BLC.concat xpmColorLines
     xpmheader    = BLC.append header xpmColors
     xpmbody      = BLC.append xpmheader xmap
     xpmdata      = BLC.append xpmbody (BLC.pack "\n};")
@@ -579,10 +579,10 @@ paletteApprox c pos =
 -----------------------------------------------------------------------------
 
 type XpmPixel2    = String
-type XpmColorRow  = String
+type XpmColorRow  = BLC.ByteString
 -- TODO: remove the other XpmColorMap, XpmPixel2 and rename.
 type XpmColorMap2 = M.Map XpmPaletteColor XpmPixel2
-type XpmBitmap2   = String
+type XpmBitmap2   = BLC.ByteString
 
 xpmColorMap :: XpmColorMap2
 xpmColorMap = M.fromList $ zip xpmPalette xpmIndices
@@ -591,7 +591,7 @@ xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry xpmColorLine) $ M.toList xpmColorMap
 
 xpmColorLine :: XpmPaletteColor -> XpmPixel2 -> XpmColorRow
-xpmColorLine pc px = printf "\"%2v c #%06X\",\n" px pc
+xpmColorLine pc px = BLC.pack $ printf "\"%2v c #%06X\",\n" px pc
 
 -----------------------------------------------------------------------------
 
@@ -603,6 +603,8 @@ bmpToXpmPixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
 -----------------------------------------------------------------------------
 
 xpmMakeBitmap2 :: BmpBitmap -> XpmBitmap2
-xpmMakeBitmap2 bitmap = intercalate ",\n" $ map (concatMap bmpToXpmPixel) bitmap
+xpmMakeBitmap2 bitmap = BLC.pack
+                        $ intercalate ",\n"
+                        $ map (concatMap bmpToXpmPixel) bitmap
 
 -----------------------------------------------------------------------------
