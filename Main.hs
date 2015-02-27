@@ -579,10 +579,10 @@ paletteApprox c pos =
 
 -----------------------------------------------------------------------------
 
-type XpmPixel     = String
+type XpmPixel2    = String
 type XpmColorRow  = String
--- TODO: remove the other XpmColorMap, and rename.
-type XpmColorMap2 = M.Map XpmPixel XpmPaletteColor
+-- TODO: remove the other XpmColorMap, XpmPixel2 and rename.
+type XpmColorMap2 = M.Map XpmPixel2 XpmPaletteColor
 
 xpmColorMap :: XpmColorMap2
 xpmColorMap = M.fromList $ zip xpmIndices xpmPalette
