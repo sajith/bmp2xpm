@@ -341,9 +341,8 @@ translateRow cmap row = BLC.pack $ concatMap (translatePixel cmap) row
 
 translatePixel :: XpmColorMap -> BmpPixel -> XpmPixel
 translatePixel m p = case M.lookup p m of
-               Just c  -> c ++ " "
-               Nothing -> "## "
-
+               Just c  -> printf "%2v" c -- c ++ " "
+               Nothing -> "##"
 
 -----------------------------------------------------------------------------
 
