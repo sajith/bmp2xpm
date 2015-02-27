@@ -4,3 +4,4 @@
 *.xpm
 dist/
 
+/a.out
