@@ -299,10 +299,10 @@ quote bs = BLC.snoc (BLC.cons dq bs) dq
 -----------------------------------------------------------------------------
 
 makeXpm :: Name -> BmpFile -> XpmData
-makeXpm name (BmpFile _ info pixels) = xpmdata -- TODO: do this correctly
+makeXpm name (BmpFile _ info bitmap) = xpmdata -- TODO: do this correctly
   where
     header       = xpmFormHeader name info
-    xmap         = translateBitmap pixels
+    xmap         = translateBitmap bitmap
     xpmColors    = BLC.concat xpmColorLines
     xpmheader    = BLC.append header xpmColors
     xpmbody      = BLC.append xpmheader xmap
