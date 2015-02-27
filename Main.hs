@@ -494,7 +494,11 @@ readBmpPixel = do
 
 -----------------------------------------------------------------------------
 
--- Using a static color palette here.
+-- Using a static color palette here, to aid the translation from
+-- RGB888 to 8-bit colors.  A better alternative would be to build a
+-- color palette from a histogram of the source image's color space,
+-- since that might give us a more faithful translation.  But we're
+-- lazy.
 
 type XpmPaletteColor = Integer
 
