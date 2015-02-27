@@ -553,8 +553,8 @@ xpmPalette =
 paletteDelta :: Integer
 paletteDelta = 0x33
 
-rgbtoPaletteColor :: BmpPixel -> XpmPaletteColor
-rgbtoPaletteColor (BmpPixel r g b) = paletteColor
+bmpToPaletteColor :: BmpPixel -> XpmPaletteColor
+bmpToPaletteColor (BmpPixel r g b) = paletteColor
   where
     r'  = toPaletteIndex r
     g'  = toPaletteIndex g
@@ -595,8 +595,8 @@ xpmColorLine pc px = printf "\"%2v c %06X\",\n" px pc
 
 -----------------------------------------------------------------------------
 
-rgbToXpmPixel :: BmpPixel -> XpmPixel2
-rgbToXpmPixel p = case M.lookup (rgbtoPaletteColor p) xpmColorMap of
+bmpToXpmPixel :: BmpPixel -> XpmPixel2
+bmpToXpmPixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
     Just c  -> show c
     Nothing -> "x"
 
