@@ -554,8 +554,8 @@ rgbtoPaletteColor (BmpPixel r g b) = paletteColor
     r'  = toPaletteIndex r
     g'  = toPaletteIndex g
     b'  = toPaletteIndex b
-    idx = fromInteger $ toInteger r' * 36 + toInteger g' * 6 + toInteger b'
-    paletteColor = xpmPalette !! idx
+    idx = toInteger r' * 36 + toInteger g' * 6 + toInteger b'
+    paletteColor = xpmPalette !! fromInteger idx
 
 toPaletteIndex :: Word8 -> Integer
 toPaletteIndex c =
