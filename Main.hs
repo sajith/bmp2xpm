@@ -46,7 +46,7 @@ import           System.IO
 import           Data.Binary.Get       (Get, getWord16le, getWord32le, getWord8,
                                         runGet)
 import           Data.Char             (ord)
-import           Data.List             (group, intercalate, nub, sort)
+import           Data.List             (group, intercalate)
 import qualified Data.Map              as M
 import           Data.Word             (Word16, Word32, Word8)
 
@@ -310,43 +310,43 @@ makeXpm name (BmpFile _ info pixels) = xpmdata -- TODO: do this correctly
 
 -----------------------------------------------------------------------------
 
-xpmMakeColorMap :: XpmColorMap -> XpmColors
-xpmMakeColorMap cmap = rows
-  where
-    -- assocs = M.toList cmap
-    assocs = M.assocs cmap
-    rows   = BLC.concat $ sort $ map translateColor assocs
+-- xpmMakeColorMap :: XpmColorMap -> XpmColors
+-- xpmMakeColorMap cmap = rows
+--   where
+--     -- assocs = M.toList cmap
+--     assocs = M.assocs cmap
+--     rows   = BLC.concat $ sort $ map translateColor assocs
 
-translateColor :: (BmpPixel, XpmIndex) -> XpmColor
-translateColor (b, c) = BLC.pack $ printf "\"%2v c %7v\",\n" c (toXpmColor b)
+-- translateColor :: (BmpPixel, XpmIndex) -> XpmColor
+-- translateColor (b, c) = BLC.pack $ printf "\"%2v c %7v\",\n" c (toXpmColor b)
 
 -----------------------------------------------------------------------------
 
-xpmMakeBitmap :: BmpBitmap -> (XpmColorMap, XpmBitmap)
-xpmMakeBitmap bmprows = (cmap, xmap)
-  where
-    cmap    = makeColorMap $ nub (concat bmprows)
-    xpmrows = map (quote . translateRow cmap) bmprows
-    xmap    = BLC.intercalate (BLC.pack ",\n") xpmrows
+-- xpmMakeBitmap :: BmpBitmap -> (XpmColorMap, XpmBitmap)
+-- xpmMakeBitmap bmprows = (cmap, xmap)
+--   where
+--     cmap    = makeColorMap $ nub (concat bmprows)
+--     xpmrows = map (quote . translateRow cmap) bmprows
+--     xmap    = BLC.intercalate (BLC.pack ",\n") xpmrows
 
-translateRow :: XpmColorMap -> BmpRow -> XpmRow
-translateRow cmap row = BLC.pack $ concatMap (translatePixel cmap) row
+-- translateRow :: XpmColorMap -> BmpRow -> XpmRow
+-- translateRow cmap row = BLC.pack $ concatMap (translatePixel cmap) row
 
 -- TODO: Remove debug stuff
 -- translateRow :: XpmColorMap -> BmpRow -> XpmRow
 -- translateRow cmap row = BLC.pack $ (show $ length row) ++ " " ++ row'
 --   where row' = concatMap (translatePixel cmap) row
 
-translatePixel :: XpmColorMap -> BmpPixel -> XpmPixel
-translatePixel m p = case M.lookup p m of
-               Just c  -> printf "%2v" c -- c ++ " "
-               Nothing -> "##"
+-- translatePixel :: XpmColorMap -> BmpPixel -> XpmPixel
+-- translatePixel m p = case M.lookup p m of
+--                Just c  -> printf "%2v" c -- c ++ " "
+--                Nothing -> "##"
 
 -----------------------------------------------------------------------------
 
 -- type XpmColor    = String
 type XpmIndex    = String
-type XpmColorMap = M.Map BmpPixel XpmIndex
+-- type XpmColorMap = M.Map BmpPixel XpmIndex
 
 -----------------------------------------------------------------------------
 
@@ -354,16 +354,16 @@ type XpmColorMap = M.Map BmpPixel XpmIndex
 -- toXpmColor (BmpPixel r g b) = BLC.pack $ printf "#%02x%02x%02x" r g b
 
 -- TODO: this translation is incorrect, fix.
-toXpmColor :: BmpPixel -> String
-toXpmColor (BmpPixel r g b) = printf "#%02X%02X%02X" r g b
+-- toXpmColor :: BmpPixel -> String
+-- toXpmColor (BmpPixel r g b) = printf "#%02X%02X%02X" r g b
 
 -----------------------------------------------------------------------------
 
 -- TODO: this makes an incorrect map, fix.
-makeColorMap :: [BmpPixel] -> XpmColorMap
-makeColorMap pixels = M.fromList $
-                      (BmpPixel{red=255,blue=255,green=255}, "##") :
-                      zip pixels xpmIndices
+-- makeColorMap :: [BmpPixel] -> XpmColorMap
+-- makeColorMap pixels = M.fromList $
+--                       (BmpPixel{red=255,blue=255,green=255}, "##") :
+--                       zip pixels xpmIndices
 
 -----------------------------------------------------------------------------
 
@@ -420,11 +420,11 @@ xpmFormHeader name info = BLC.pack $
 
 -----------------------------------------------------------------------------
 
-type ColorIndex = String
-type ColorTriplet = String
+-- type ColorIndex = String
+-- type ColorTriplet = String
 
-colorify :: BmpPixel -> (ColorIndex, ColorTriplet)
-colorify = undefined
+-- colorify :: BmpPixel -> (ColorIndex, ColorTriplet)
+-- colorify = undefined
 
 -----------------------------------------------------------------------------
 
