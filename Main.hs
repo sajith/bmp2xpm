@@ -582,20 +582,23 @@ paletteApprox c pos =
 type XpmPixel2    = String
 type XpmColorRow  = String
 -- TODO: remove the other XpmColorMap, XpmPixel2 and rename.
-type XpmColorMap2 = M.Map XpmPixel2 XpmPaletteColor
+-- type XpmColorMap2 = M.Map XpmPixel2 XpmPaletteColor
 
-xpmColorMap :: XpmColorMap2
-xpmColorMap = M.fromList $ zip xpmIndices xpmPalette
+-- xpmColorMap :: XpmColorMap2
+xpmColorMap :: M.Map XpmPaletteColor XpmPixel2
+xpmColorMap = M.fromList $ zip xpmPalette xpmIndices
 
 xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry xpmColorLine) $ M.toList xpmColorMap
 
-xpmColorLine :: XpmColorStr -> XpmPaletteColor -> XpmColorRow
-xpmColorLine = printf "\"%2v c %06X\",\n"
+xpmColorLine :: XpmPaletteColor -> XpmPixel2 -> XpmColorRow
+xpmColorLine pc px = printf "\"%2v c %06X\",\n" px pc
 
 -----------------------------------------------------------------------------
 
-rgbToXpmPixel :: BmpPixel -> XpmColorStr
-rgbToXpmPixel = undefined
+rgbToXpmPixel :: BmpPixel -> XpmPixel2
+rgbToXpmPixel p = case M.lookup (rgbtoPaletteColor p) xpmColorMap of
+    Just c  -> show c
+    Nothing -> "x"
 
 -----------------------------------------------------------------------------
