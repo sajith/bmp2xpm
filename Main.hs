@@ -502,31 +502,30 @@ paletteApprox c pos =
 
 -----------------------------------------------------------------------------
 
-type XpmPixel2    = String
+type XpmPixel     = String
 type XpmColorRow  = BLC.ByteString
--- TODO: remove the other XpmColorMap, XpmPixel2 and rename.
-type XpmColorMap2 = M.Map XpmPaletteColor XpmPixel2
-type XpmBitmap2   = BLC.ByteString
+type XpmColorMap  = M.Map XpmPaletteColor XpmPixel
+type XpmBitmap    = BLC.ByteString
 
-xpmColorMap :: XpmColorMap2
+xpmColorMap :: XpmColorMap
 xpmColorMap = M.fromList $ zip xpmPalette xpmIndices
 
 xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry xpmColorLine) $ M.toList xpmColorMap
 
-xpmColorLine :: XpmPaletteColor -> XpmPixel2 -> XpmColorRow
+xpmColorLine :: XpmPaletteColor -> XpmPixel -> XpmColorRow
 xpmColorLine pc px = BLC.pack $ printf "\"%2v c #%06X\",\n" px pc
 
 -----------------------------------------------------------------------------
 
-translatePixel :: BmpPixel -> XpmPixel2
+translatePixel :: BmpPixel -> XpmPixel
 translatePixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
     Just c  -> printf "%2v" c
     Nothing -> printf "%2v" "x"
 
 -----------------------------------------------------------------------------
 
-translateBitmap :: BmpBitmap -> XpmBitmap2
+translateBitmap :: BmpBitmap -> XpmBitmap
 translateBitmap bitmap = BLC.pack
                         $ intercalate ",\n"
                         $ map (show . concatMap translatePixel) bitmap
