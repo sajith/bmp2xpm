@@ -302,7 +302,7 @@ makeXpm :: Name -> BmpFile -> XpmData
 makeXpm name (BmpFile _ info pixels) = xpmdata -- TODO: do this correctly
   where
     header       = xpmFormHeader name info
-    xmap         = xpmMakeBitmap2 pixels
+    xmap         = translateBitmap pixels
     xpmColors    = BLC.concat xpmColorLines
     xpmheader    = BLC.append header xpmColors
     xpmbody      = BLC.append xpmheader xmap
@@ -595,16 +595,16 @@ xpmColorLine pc px = BLC.pack $ printf "\"%2v c #%06X\",\n" px pc
 
 -----------------------------------------------------------------------------
 
-bmpToXpmPixel :: BmpPixel -> XpmPixel2
-bmpToXpmPixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
+translatePixel :: BmpPixel -> XpmPixel2
+translatePixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
     Just c  -> printf "%2v" c
     Nothing -> "x"
 
 -----------------------------------------------------------------------------
 
-xpmMakeBitmap2 :: BmpBitmap -> XpmBitmap2
-xpmMakeBitmap2 bitmap = BLC.pack
+translateBitmap :: BmpBitmap -> XpmBitmap2
+translateBitmap bitmap = BLC.pack
                         $ intercalate ",\n"
-                        $ map (concatMap bmpToXpmPixel) bitmap
+                        $ map (concatMap translatePixel) bitmap
 
 -----------------------------------------------------------------------------
