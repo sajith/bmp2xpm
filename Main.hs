@@ -578,3 +578,19 @@ paletteApprox c pos =
           d2 = abs $ c - xpmPalette !! fromInteger pos+1
 
 -----------------------------------------------------------------------------
+
+type XpmColorStr  = String
+type XpmColorRow  = String
+-- TODO: remove the other XpmColorMap, and rename.
+type XpmColorMap2 = M.Map XpmColorStr XpmPaletteColor
+
+xpmColorMap :: XpmColorMap2
+xpmColorMap = M.fromList $ zip xpmIndices xpmPalette
+
+xpmColorLines :: [XpmColorRow]
+xpmColorLines = map (uncurry xpmColorLine) $ M.toList xpmColorMap
+
+xpmColorLine :: XpmColorStr -> XpmPaletteColor -> XpmColorRow
+xpmColorLine = printf "\"%2v c %06X\",\n"
+
+-----------------------------------------------------------------------------
