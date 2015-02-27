@@ -594,3 +594,8 @@ xpmColorLine :: XpmColorStr -> XpmPaletteColor -> XpmColorRow
 xpmColorLine = printf "\"%2v c %06X\",\n"
 
 -----------------------------------------------------------------------------
+
+rgbToXpmPixel :: BmpPixel -> XpmColorStr
+rgbToXpmPixel = undefined
+
+-----------------------------------------------------------------------------
