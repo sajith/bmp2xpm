@@ -522,7 +522,7 @@ xpmColorLine pc px = BLC.pack $ printf "\"%2v c #%06X\",\n" px pc
 translatePixel :: BmpPixel -> XpmPixel2
 translatePixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
     Just c  -> printf "%2v" c
-    Nothing -> "x"
+    Nothing -> printf "%2v" "x"
 
 -----------------------------------------------------------------------------
 
