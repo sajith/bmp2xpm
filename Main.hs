@@ -332,7 +332,6 @@ xpmIndices = oneLetters ++ filter (/= "##") (twoLetters xpmChrRange)
 
 type BmpBody   = BLC.ByteString
 type XpmHeader = BLC.ByteString
-type XpmBody   = BLC.ByteString
 
 -----------------------------------------------------------------------------
 
