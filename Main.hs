@@ -287,11 +287,6 @@ type XpmData   = BLC.ByteString -- = XpmHeader + XpmColors + [XpmRow] + XpmTail
 
 -----------------------------------------------------------------------------
 
--- toXpmColor :: BmpPixel -> XpmPixel
--- toXpmColor (BmpPixel r g b) = BLC.pack $ printf "#%02x%02x%02x" r g b
-
------------------------------------------------------------------------------
-
 quote :: BLC.ByteString -> BLC.ByteString
 quote bs = BLC.snoc (BLC.cons dq bs) dq
            where dq = '\"'
@@ -310,60 +305,7 @@ makeXpm name (BmpFile _ info bitmap) = xpmdata -- TODO: do this correctly
 
 -----------------------------------------------------------------------------
 
--- xpmMakeColorMap :: XpmColorMap -> XpmColors
--- xpmMakeColorMap cmap = rows
---   where
---     -- assocs = M.toList cmap
---     assocs = M.assocs cmap
---     rows   = BLC.concat $ sort $ map translateColor assocs
-
--- translateColor :: (BmpPixel, XpmIndex) -> XpmColor
--- translateColor (b, c) = BLC.pack $ printf "\"%2v c %7v\",\n" c (toXpmColor b)
-
------------------------------------------------------------------------------
-
--- xpmMakeBitmap :: BmpBitmap -> (XpmColorMap, XpmBitmap)
--- xpmMakeBitmap bmprows = (cmap, xmap)
---   where
---     cmap    = makeColorMap $ nub (concat bmprows)
---     xpmrows = map (quote . translateRow cmap) bmprows
---     xmap    = BLC.intercalate (BLC.pack ",\n") xpmrows
-
--- translateRow :: XpmColorMap -> BmpRow -> XpmRow
--- translateRow cmap row = BLC.pack $ concatMap (translatePixel cmap) row
-
--- TODO: Remove debug stuff
--- translateRow :: XpmColorMap -> BmpRow -> XpmRow
--- translateRow cmap row = BLC.pack $ (show $ length row) ++ " " ++ row'
---   where row' = concatMap (translatePixel cmap) row
-
--- translatePixel :: XpmColorMap -> BmpPixel -> XpmPixel
--- translatePixel m p = case M.lookup p m of
---                Just c  -> printf "%2v" c -- c ++ " "
---                Nothing -> "##"
-
------------------------------------------------------------------------------
-
--- type XpmColor    = String
 type XpmIndex    = String
--- type XpmColorMap = M.Map BmpPixel XpmIndex
-
------------------------------------------------------------------------------
-
--- toXpmColor :: BmpPixel -> XpmColor
--- toXpmColor (BmpPixel r g b) = BLC.pack $ printf "#%02x%02x%02x" r g b
-
--- TODO: this translation is incorrect, fix.
--- toXpmColor :: BmpPixel -> String
--- toXpmColor (BmpPixel r g b) = printf "#%02X%02X%02X" r g b
-
------------------------------------------------------------------------------
-
--- TODO: this makes an incorrect map, fix.
--- makeColorMap :: [BmpPixel] -> XpmColorMap
--- makeColorMap pixels = M.fromList $
---                       (BmpPixel{red=255,blue=255,green=255}, "##") :
---                       zip pixels xpmIndices
 
 -----------------------------------------------------------------------------
 
@@ -377,15 +319,6 @@ xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
               "!~^/()_`'][{}|"
 
 -- TODO: rewrite this mawky stuff.
--- xpmIndices :: Int -> [String]
--- xpmIndices n = take n $ oneLetters ++ twoLetters xpmChrRange
---   where
---     oneLetters = group xpmChrRange
-
---     twoLetters :: String -> [String]
---     twoLetters []     = group ""
---     twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
-
 xpmIndices :: [XpmIndex]
 xpmIndices = oneLetters ++ filter (/= "##") (twoLetters xpmChrRange)
   where
@@ -407,7 +340,6 @@ xpmCharsPerPixel :: Integer
 xpmCharsPerPixel = 2
 
 xpmNumColors :: Integer
--- xpmNumColors = 256
 xpmNumColors = 216
 
 xpmFormHeader :: Name -> BmpInfoHeader -> XpmHeader
@@ -417,14 +349,6 @@ xpmFormHeader name info = BLC.pack $
     ++ "/* columns rows colors chars-per-pixel */\n\""
     ++ show (imageWidth info) ++ " " ++ show (imageHeight info) ++ " "
     ++ show xpmNumColors ++ " " ++ show xpmCharsPerPixel ++ "\",\n"
-
------------------------------------------------------------------------------
-
--- type ColorIndex = String
--- type ColorTriplet = String
-
--- colorify :: BmpPixel -> (ColorIndex, ColorTriplet)
--- colorify = undefined
 
 -----------------------------------------------------------------------------
 
