@@ -46,7 +46,7 @@ import           System.IO
 import           Data.Binary.Get       (Get, getWord16le, getWord32le, getWord8,
                                         runGet)
 import           Data.Char             (ord)
-import           Data.List             (group, nub, sort)
+import           Data.List             (group, intercalate, nub, sort)
 import qualified Data.Map              as M
 import           Data.Word             (Word16, Word32, Word8)
 
@@ -302,10 +302,8 @@ makeXpm :: Name -> BmpFile -> XpmData
 makeXpm name (BmpFile _ info pixels) = xpmdata -- TODO: do this correctly
   where
     header       = xpmFormHeader name info
-    -- xmap      = BLC.intercalate (BLC.pack ",\n")
-    --          $ map xpmMakeBitmap pixels
-    (cmap, xmap) = xpmMakeBitmap pixels
-    xpmColors    = xpmMakeColorMap cmap
+    xmap         = BLC.pack $ xpmMakeBitmap2 pixels
+    xpmColors    = BLC.pack $ concat xpmColorLines
     xpmheader    = BLC.append header xpmColors
     xpmbody      = BLC.append xpmheader xmap
     xpmdata      = BLC.append xpmbody (BLC.pack "\n};")
@@ -409,7 +407,8 @@ xpmCharsPerPixel :: Integer
 xpmCharsPerPixel = 2
 
 xpmNumColors :: Integer
-xpmNumColors = 256
+-- xpmNumColors = 256
+xpmNumColors = 216
 
 xpmFormHeader :: Name -> BmpInfoHeader -> XpmHeader
 xpmFormHeader name info = BLC.pack $
@@ -583,6 +582,7 @@ type XpmPixel2    = String
 type XpmColorRow  = String
 -- TODO: remove the other XpmColorMap, XpmPixel2 and rename.
 type XpmColorMap2 = M.Map XpmPaletteColor XpmPixel2
+type XpmBitmap2   = String
 
 xpmColorMap :: XpmColorMap2
 xpmColorMap = M.fromList $ zip xpmPalette xpmIndices
@@ -591,13 +591,18 @@ xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry xpmColorLine) $ M.toList xpmColorMap
 
 xpmColorLine :: XpmPaletteColor -> XpmPixel2 -> XpmColorRow
-xpmColorLine pc px = printf "\"%2v c %06X\",\n" px pc
+xpmColorLine pc px = printf "\"%2v c #%06X\",\n" px pc
 
 -----------------------------------------------------------------------------
 
 bmpToXpmPixel :: BmpPixel -> XpmPixel2
 bmpToXpmPixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
-    Just c  -> show c
+    Just c  -> printf "%2v" c
     Nothing -> "x"
+
+-----------------------------------------------------------------------------
+
+xpmMakeBitmap2 :: BmpBitmap -> XpmBitmap2
+xpmMakeBitmap2 bitmap = intercalate ",\n" $ map (concatMap bmpToXpmPixel) bitmap
 
 -----------------------------------------------------------------------------
