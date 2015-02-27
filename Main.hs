@@ -502,7 +502,8 @@ readBmpPixel = do
 
 type XpmPaletteColor = Integer
 
--- This is our 261-color palette.
+-- This is our 216-color palette.  (Why 216 colors? 6 choices each of
+-- red, green blue gives us 6*6*6 = 216 colors.)
 xpmPalette :: [XpmPaletteColor]
 xpmPalette =
     [
