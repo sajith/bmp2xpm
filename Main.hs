@@ -560,10 +560,11 @@ rgbtoPaletteColor (BmpPixel r g b) = paletteColor
 toPaletteIndex :: Word8 -> Integer
 toPaletteIndex c =
     if c' `mod` paletteDelta == 0
-        then c' `div` paletteDelta
-        else paletteApprox c' (c' `div` paletteDelta)
+        then pos
+        else paletteApprox c' pos
     where
-      c' = toInteger c
+      c'  = toInteger c
+      pos = c' `div` paletteDelta
 
 paletteApprox :: Integer -> Integer -> XpmPaletteColor
 paletteApprox c pos =
