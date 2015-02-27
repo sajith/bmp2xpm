@@ -605,6 +605,7 @@ translatePixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
 translateBitmap :: BmpBitmap -> XpmBitmap2
 translateBitmap bitmap = BLC.pack
                         $ intercalate ",\n"
+                        $ map show
                         $ map (concatMap translatePixel) bitmap
 
 -----------------------------------------------------------------------------
