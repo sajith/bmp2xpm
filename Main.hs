@@ -191,7 +191,7 @@ process infile outfile = do
 
 -----------------------------------------------------------------------------
 
-type Name = String
+type BitmapName = String
 
 -----------------------------------------------------------------------------
 
@@ -211,7 +211,7 @@ showRows (BmpFile _ _ pixels) = mapM_ showLength pixels
 
 -----------------------------------------------------------------------------
 
-runConversion :: Name -> Handle -> Handle -> IO ()
+runConversion :: BitmapName -> Handle -> Handle -> IO ()
 runConversion name bmpHandle xpmHandle = do
 
     putStrLn "running..."
@@ -255,9 +255,9 @@ runConversion name bmpHandle xpmHandle = do
 
 -----------------------------------------------------------------------------
 
-type Width  = Integer
-type Height = Integer
-type RowNum = Integer
+type BitmapWidth  = Integer
+type BitmapHeight = Integer
+type BitmapRowNum = Integer
 
 -----------------------------------------------------------------------------
 
@@ -268,7 +268,7 @@ getBmpBitmap hdr bs = pixels
     height    = fromIntegral $ imageHeight hdr
     pixels    = map (\h -> getBmpRow h width bs) [0..(height-1)]
 
-getBmpRow :: RowNum -> Width -> BL.ByteString -> BmpRow
+getBmpRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpRow
 getBmpRow rownum width bs = row
   where
     bs'         = BL.drop (fromIntegral (rownum*width)) bs
@@ -293,7 +293,7 @@ quote bs = BLC.snoc (BLC.cons dq bs) dq
 
 -----------------------------------------------------------------------------
 
-makeXpm :: Name -> BmpFile -> XpmData
+makeXpm :: BitmapName -> BmpFile -> XpmData
 makeXpm name (BmpFile _ info bitmap) = xpmdata -- TODO: do this correctly
   where
     header       = xpmFormHeader name info
@@ -341,7 +341,7 @@ xpmCharsPerPixel = 2
 xpmNumColors :: Integer
 xpmNumColors = 216
 
-xpmFormHeader :: Name -> BmpInfoHeader -> XpmHeader
+xpmFormHeader :: BitmapName -> BmpInfoHeader -> XpmHeader
 xpmFormHeader name info = BLC.pack $
     "/* XPM */\n"
     ++ "static char *" ++ name ++ "[] = {\n"
