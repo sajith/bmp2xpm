@@ -122,12 +122,12 @@ bmpFileType = toEnum $ ord 'M' * 256 + ord 'B'
 --   3 - RGB bitmap with mask
 --
 -- Only uncompressed BMP files are supported.
-bmpCompressionSupported :: Word32
-bmpCompressionSupported = 0
+bmpCompressionSupported :: BmpInfoHeader -> Bool
+bmpCompressionSupported info = compression info == 0
 
 -- | Only 24-bit pixels are supported.
-bmpColorDepthSupported :: Word16
-bmpColorDepthSupported = 24
+bmpColorDepthSupported :: BmpInfoHeader -> Bool
+bmpColorDepthSupported info = bitsPerPixel info == 24
 
 -----------------------------------------------------------------------------
 
@@ -241,11 +241,11 @@ runConversion name bmpHandle xpmHandle = do
 
     showRows bmpdata
 
-    when (bitsPerPixel bmpinfo /= bmpColorDepthSupported) $
+    unless (bmpColorDepthSupported bmpinfo) $
         error $ "Can't run conversion: I don't know how to handle "
                 ++ show (bitsPerPixel bmpinfo) ++ "-bit pixels."
 
-    when (compression bmpinfo /= bmpCompressionSupported) $
+    unless (bmpCompressionSupported bmpinfo) $
         error "Can't run conversion: I don't know how to handle compressed bitmaps."
 
     let xpmdata = makeXpm name bmpdata
