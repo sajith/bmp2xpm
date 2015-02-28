@@ -205,9 +205,9 @@ checkFileSize inh = do
 
 -- TODO: temporary debugging function, remove this.
 showRows :: BmpFile -> IO ()
-showRows (BmpFile _ _ pixels) = mapM_ showLength pixels
+showRows (BmpFile _ _ pixels) = mapM_ showRowLength pixels
   where
-    showLength x = putStrLn$ "length: " ++ show (length x)
+    showRowLength x = putStrLn$ "length: " ++ show (length x)
 
 -----------------------------------------------------------------------------
 
