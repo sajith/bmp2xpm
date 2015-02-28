@@ -330,7 +330,6 @@ xpmIndices = oneLetters ++ twoLetters xpmChrRange
 
 -----------------------------------------------------------------------------
 
-type BmpBody   = BLC.ByteString
 type XpmHeader = BLC.ByteString
 
 -----------------------------------------------------------------------------
