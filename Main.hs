@@ -278,12 +278,7 @@ getBmpRow rownum width bs = -- trace ("getBmpRow: read " ++ show (length row)) $
 
 -----------------------------------------------------------------------------
 
--- type XpmColor  = BLC.ByteString -- format: "xx c #xxxxxx"
--- type XpmColors = BLC.ByteString
--- type XpmBitmap = BLC.ByteString
--- type XpmPixel  = String -- BLC.ByteString
--- type XpmRow    = BLC.ByteString
-type XpmData   = BLC.ByteString -- = XpmHeader + XpmColors + [XpmRow] + XpmTail
+type XpmData   = BLC.ByteString
 
 -----------------------------------------------------------------------------
 
