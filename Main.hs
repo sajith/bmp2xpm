@@ -255,7 +255,6 @@ runConversion name bmpHandle xpmHandle = do
 
 type BitmapName   = String
 type BitmapWidth  = Integer
-type BitmapHeight = Integer
 type BitmapRowNum = Integer
 
 -----------------------------------------------------------------------------
