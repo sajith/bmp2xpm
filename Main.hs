@@ -320,7 +320,7 @@ xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
 
 -- TODO: rewrite this mawky stuff.
 xpmIndices :: [XpmIndex]
-xpmIndices = oneLetters ++ filter (/= "##") (twoLetters xpmChrRange)
+xpmIndices = oneLetters ++ twoLetters xpmChrRange
   where
     oneLetters = group xpmChrRange
     -- TODO: rewrite this.
