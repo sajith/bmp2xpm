@@ -267,8 +267,7 @@ getBmpBitmap hdr bs = pixels
     pixels    = map (\h -> getBmpRow h width bs) [0..(height-1)]
 
 getBmpRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpRow
-getBmpRow rownum width bs = -- trace ("getBmpRow: read " ++ show (length row)) $
-                            row
+getBmpRow rownum width bs = row
   where
     bs'         = BL.drop (fromIntegral (rownum*width)) bs
     offsets     = [0,3..(width-1)*3]
