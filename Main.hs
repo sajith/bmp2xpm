@@ -85,9 +85,9 @@ data BmpInfoHeader = BmpInfoHeader {
 
 -- | Pixel representation for uncompressed BMP files.
 data BmpPixel = BmpPixel {
-      red   :: Word8
+      blue  :: Word8
     , green :: Word8
-    , blue  :: Word8
+    , red   :: Word8
     } deriving (Show, Ord)
 
 -- | Need this to 'nub' the pixel array.
@@ -406,12 +406,12 @@ readBmpInfoHeader = do
 -- | Read (uncompressed) pixel information
 readBmpPixel :: Get BmpPixel
 readBmpPixel = do
-    r <- getWord8
-    g <- getWord8
     b <- getWord8
-    return BmpPixel { red   = r
+    g <- getWord8
+    r <- getWord8
+    return BmpPixel { blue  = b
                     , green = g
-                    , blue  = b
+                    , red   = r
                     }
 
 -----------------------------------------------------------------------------
@@ -478,10 +478,10 @@ paletteDelta = 0x33
 bmpToPaletteColor :: BmpPixel -> XpmPaletteColor
 bmpToPaletteColor (BmpPixel r g b) = paletteColor
   where
-    r'  = toPaletteIndex r
-    g'  = toPaletteIndex g
     b'  = toPaletteIndex b
-    idx = toInteger r' * 36 + toInteger g' * 6 + toInteger b'
+    g'  = toPaletteIndex g
+    r'  = toPaletteIndex r
+    idx = toInteger b' * 36 + toInteger g' * 6 + toInteger r'
     paletteColor = xpmPalette !! fromInteger idx
 
 toPaletteIndex :: Word8 -> Integer
