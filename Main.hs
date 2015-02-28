@@ -261,18 +261,18 @@ type BitmapRowNum = Integer
 
 getBmpBitmap :: BmpInfoHeader -> BL.ByteString -> BmpBitmap
 getBmpBitmap hdr bs = pixels
-  where
-    width     = fromIntegral $ imageWidth hdr
-    height    = fromIntegral $ imageHeight hdr
-    pixels    = map (\h -> getBmpRow h width bs) [0..(height-1)]
+    where
+        width     = fromIntegral $ imageWidth hdr
+        height    = fromIntegral $ imageHeight hdr
+        pixels    = map (\h -> getBmpRow h width bs) [0..(height-1)]
 
 getBmpRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpRow
 getBmpRow rownum width bs = row
-  where
-    bs'         = BL.drop (fromIntegral (rownum*width)) bs
-    offsets     = [0,3..(width-1)*3]
-    newOffset o = BL.drop (fromIntegral o) bs'
-    row         = map (runGet readBmpPixel . newOffset) offsets
+    where
+        bs'         = BL.drop (fromIntegral (rownum*width)) bs
+        offsets     = [0,3..(width-1)*3]
+        newOffset o = BL.drop (fromIntegral o) bs'
+        row         = map (runGet readBmpPixel . newOffset) offsets
 
 -----------------------------------------------------------------------------
 
@@ -288,13 +288,13 @@ type XpmData   = BLC.ByteString
 
 makeXpm :: BitmapName -> BmpFile -> XpmData
 makeXpm name (BmpFile _ info bitmap) = xpmData -- TODO: do this correctly
-  where
-    header       = xpmFormHeader name info
-    xpmBitmap    = translateBitmap bitmap
-    xpmColors    = BLC.concat xpmColorLines
-    xpmHeader    = BLC.append header xpmColors
-    xpmBody      = BLC.append xpmHeader xpmBitmap
-    xpmData      = BLC.append xpmBody (BLC.pack "\n};")
+    where
+        header       = xpmFormHeader name info
+        xpmBitmap    = translateBitmap bitmap
+        xpmColors    = BLC.concat xpmColorLines
+        xpmHeader    = BLC.append header xpmColors
+        xpmBody      = BLC.append xpmHeader xpmBitmap
+        xpmData      = BLC.append xpmBody (BLC.pack "\n};")
 
 -----------------------------------------------------------------------------
 
@@ -314,12 +314,12 @@ xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
 -- TODO: rewrite this mawky stuff.
 xpmIndices :: [XpmIndex]
 xpmIndices = oneLetters ++ twoLetters xpmChrRange
-  where
-    oneLetters = group xpmChrRange
-    -- TODO: rewrite this.
-    twoLetters :: String -> [String]
-    twoLetters []     = group ""
-    twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
+    where
+        oneLetters = group xpmChrRange
+        -- TODO: rewrite this.
+        twoLetters :: String -> [String]
+        twoLetters []     = group ""
+        twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
 
 -----------------------------------------------------------------------------
 
@@ -468,13 +468,13 @@ paletteDelta :: Integer
 paletteDelta = 0x33
 
 bmpToPaletteColor :: BmpPixel -> XpmPaletteColor
-bmpToPaletteColor (BmpPixel r g b) = paletteColor
-  where
-    b'  = toPaletteIndex b
-    g'  = toPaletteIndex g
-    r'  = toPaletteIndex r
-    idx = toInteger b' * 36 + toInteger g' * 6 + toInteger r'
-    paletteColor = xpmPalette !! fromInteger idx
+bmpToPaletteColor (BmpPixel b g r) = paletteColor
+    where
+        b'  = toPaletteIndex b
+        g'  = toPaletteIndex g
+        r'  = toPaletteIndex r
+        idx = toInteger b' * 36 + toInteger g' * 6 + toInteger r'
+        paletteColor = xpmPalette !! fromInteger idx
 
 toPaletteIndex :: Word8 -> Integer
 toPaletteIndex c =
@@ -482,8 +482,8 @@ toPaletteIndex c =
         then pos
         else paletteApprox c' pos
     where
-      c'  = toInteger c
-      pos = c' `div` paletteDelta
+        c'  = toInteger c
+        pos = c' `div` paletteDelta
 
 paletteApprox :: Integer -> Integer -> XpmPaletteColor
 paletteApprox c pos =
