@@ -191,10 +191,6 @@ process infile outfile = do
 
 -----------------------------------------------------------------------------
 
-type BitmapName = String
-
------------------------------------------------------------------------------
-
 checkFileSize :: Handle -> IO ()
 checkFileSize inh = do
     size <- hFileSize inh
@@ -204,10 +200,12 @@ checkFileSize inh = do
 -----------------------------------------------------------------------------
 
 -- TODO: temporary debugging function, remove this.
-showRows :: BmpFile -> IO ()
-showRows (BmpFile _ _ pixels) = mapM_ showRowLength pixels
-  where
-    showRowLength x = putStrLn$ "length: " ++ show (length x)
+-- Checks all rows in the bitmap are of the same length.
+checkRows :: BmpFile -> IO ()
+checkRows (BmpFile _ _ pixels) =
+    if length (group $ map length pixels) == 1
+        then putStrLn "Bitmap OK"
+        else error "Problem: irregular bitmap"
 
 -----------------------------------------------------------------------------
 
@@ -236,10 +234,10 @@ runConversion name bmpHandle xpmHandle = do
     putStrLn$ "BMP info    : " ++ show bmpinfo
     putStrLn$ "Body length : " ++ show (BL.length bmpbody)
 
-    putStrLn$ "Read " ++ show (length pixels) ++ " pixels ("
-            ++ show (3 * length pixels) ++ " bytes)"
+    putStrLn$ "Read " ++ show (length (concat pixels)) ++ " pixels ("
+            ++ show (3 * length (concat pixels)) ++ " bytes)"
 
-    showRows bmpdata
+    checkRows bmpdata
 
     unless (bmpColorDepthSupported bmpinfo) $
         error $ "Can't run conversion: I don't know how to handle "
@@ -255,6 +253,7 @@ runConversion name bmpHandle xpmHandle = do
 
 -----------------------------------------------------------------------------
 
+type BitmapName   = String
 type BitmapWidth  = Integer
 type BitmapHeight = Integer
 type BitmapRowNum = Integer
@@ -269,7 +268,8 @@ getBmpBitmap hdr bs = pixels
     pixels    = map (\h -> getBmpRow h width bs) [0..(height-1)]
 
 getBmpRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpRow
-getBmpRow rownum width bs = row
+getBmpRow rownum width bs = -- trace ("getBmpRow: read " ++ show (length row)) $
+                            row
   where
     bs'         = BL.drop (fromIntegral (rownum*width)) bs
     offsets     = [0,3..(width-1)*3]
