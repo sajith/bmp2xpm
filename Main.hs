@@ -280,9 +280,9 @@ type XpmData   = BLC.ByteString
 
 -----------------------------------------------------------------------------
 
-quote :: BLC.ByteString -> BLC.ByteString
-quote bs = BLC.snoc (BLC.cons dq bs) dq
-           where dq = '\"'
+-- quote :: BLC.ByteString -> BLC.ByteString
+-- quote bs = BLC.snoc (BLC.cons dq bs) dq
+--            where dq = '\"'
 
 -----------------------------------------------------------------------------
 
