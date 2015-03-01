@@ -49,6 +49,8 @@ import           Data.Binary.Get       (Get, getWord16le, getWord32le, getWord8,
 import           Data.Char             (ord)
 import           Data.List             (group, intercalate)
 import qualified Data.Map              as M
+
+import           Data.Int              (Int32)
 import           Data.Word             (Word16, Word32, Word8)
 
 import           Text.Printf           (printf)
@@ -72,8 +74,8 @@ data BmpFileHeader = BmpFileHeader {
 -- | The 14-byte BMP file is followed by this "info" header.
 data BmpInfoHeader = BmpInfoHeader {
       infoHeaderSize  :: Word32 -- Size of info header, in bytes.
-    , imageWidth      :: Word32 -- Width of image, in pixels. u32.
-    , imageHeight     :: Word32 -- Height of image, in pixels. u32.
+    , imageWidth      :: Int32  -- Width of image, in pixels. u32.
+    , imageHeight     :: Int32  -- Height of image, in pixels. u32.
     , colorPlanes     :: Word16 -- Number of color planes.  Always 1 for BMP files.
     , bitsPerPixel    :: Word16 -- Number of bits per pixel. legal values: 1,4,8,24.
     , compression     :: Word32 -- Compression method used.
@@ -382,8 +384,8 @@ readBmpInfoHeader = do
     usedc  <- getWord32le
     mainc  <- getWord32le
     return BmpInfoHeader { infoHeaderSize  = size
-                         , imageWidth      = width
-                         , imageHeight     = height
+                         , imageWidth      = fromIntegral width
+                         , imageHeight     = fromIntegral height
                          , colorPlanes     = planes
                          , bitsPerPixel    = bits
                          , compression     = compr
