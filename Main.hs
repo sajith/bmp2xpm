@@ -264,12 +264,12 @@ getBmpBitmap hdr bs = pixels
     where
         width     = fromIntegral $ imageWidth hdr
         height    = fromIntegral $ imageHeight hdr
-        pixels    = map (\h -> getBmpRow h width bs) [0..(height-1)]
+        pixels    = map (\h -> getBmpRow h width bs) (reverse [0..(height-1)])
 
 getBmpRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpRow
 getBmpRow rownum width bs = row
     where
-        bs'         = BL.drop (fromIntegral (rownum*width)) bs
+        bs'         = BL.drop (fromIntegral (rownum*width*3)) bs
         offsets     = [0,3..(width-1)*3]
         newOffset o = BL.drop (fromIntegral o) bs'
         row         = map (runGet readBmpPixel . newOffset) offsets
