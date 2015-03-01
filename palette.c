@@ -15,7 +15,7 @@ typedef struct rgbquad {
         uint8_t reserved;
 } rgbquad_t;
 
-uint32_t cast (rgbquad_t q)
+uint32_t quad2uint32 (rgbquad_t q)
 {
         return q.red << 16 | q.green << 8 | q.blue;
 }
@@ -37,7 +37,7 @@ int main (int argc, char **argv)
                                 q.red      = deltas[red];                                
                                 q.reserved = 0;
                                 
-                                palette[index] = cast(q);
+                                palette[index] = quad2uint32 (q);
                                 index++;
                         }
                 }
