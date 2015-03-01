@@ -74,14 +74,14 @@ data BmpFileHeader = BmpFileHeader {
 -- | The 14-byte BMP file is followed by this "info" header.
 data BmpInfoHeader = BmpInfoHeader {
       infoHeaderSize  :: Word32 -- Size of info header, in bytes.
-    , imageWidth      :: Int32  -- Width of image, in pixels. u32.
-    , imageHeight     :: Int32  -- Height of image, in pixels. u32.
+    , imageWidth      :: Int32  -- Width of image, in pixels.
+    , imageHeight     :: Int32  -- Height of image, in pixels.
     , colorPlanes     :: Word16 -- Number of color planes.  Always 1 for BMP files.
     , bitsPerPixel    :: Word16 -- Number of bits per pixel. legal values: 1,4,8,24.
     , compression     :: Word32 -- Compression method used.
     , bitmapSize      :: Word32 -- Size of bitmap image data, in bytes.
-    , xResolution     :: Word32 -- Horizontal resolution, in pixels per meter. u32.
-    , yResolution     :: Word32 -- Vertical resolution, in pixels per meter. u32.
+    , xResolution     :: Word32 -- Horizontal resolution, in pixels per meter.
+    , yResolution     :: Word32 -- Vertical resolution, in pixels per meter.
     , colorsUsed      :: Word32 -- Number of colors in the bitmap.
     , colorsImportant :: Word32 -- Min. number of important colors.
     } deriving Show
