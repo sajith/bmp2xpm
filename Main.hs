@@ -22,7 +22,8 @@
 
  TODO:
 
-  [ ] The actual image conversion.
+  [ ] handle -ve heights (which changes how scanlines are stored)
+  [ ] handle scanline padding, if present.
   [ ] Use parallelsim and/or concurrency.
   [ ] Measure space usage, try pipes/conduit.
   [ ] More useful debug/error messages.
