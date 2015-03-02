@@ -338,12 +338,14 @@ readBmpPixel = do
 
 -----------------------------------------------------------------------------
 
+-- XPM v3 types.
+
 type XpmData      = BLC.ByteString -- the whole file.
 
-type XpmHeader    = BLC.ByteString -- row, columns, colors, etc.
+type XpmHeader    = BLC.ByteString -- rows, columns, colors, etc.
 type XpmPixel     = BLC.ByteString -- two-character pixels.
 type XpmColorRow  = BLC.ByteString -- "pp c #bbggrr" line.
-type XpmBitmap    = BLC.ByteString -- bitmap.
+type XpmBitmap    = BLC.ByteString -- the actual xpm bitmap.
 
 type XpmColorMap  = M.Map XpmPaletteColor XpmPixel
 
