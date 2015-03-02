@@ -338,7 +338,7 @@ readBmpPixel = do
 
 -----------------------------------------------------------------------------
 
--- XPM v3 types.
+-- XPM v3 types.  Everything is a string!
 
 type XpmData      = BLC.ByteString -- the whole file.
 
