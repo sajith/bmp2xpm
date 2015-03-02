@@ -92,7 +92,7 @@ process infile outfile = do
     let name = takeBaseName infile
 
     withBinaryFile infile ReadMode
-        (withFile outfile WriteMode . runConversion name)
+        (\h -> runConversion name h outfile)
 
     putStrLn $ infile ++ " -> " ++ outfile ++ " conversion done."
 
@@ -138,8 +138,8 @@ checkRows (BmpFile _ _ pixels) =
 
 -----------------------------------------------------------------------------
 
-runConversion :: BitmapName -> Handle -> Handle -> IO ()
-runConversion name bmpHandle xpmHandle = do
+runConversion :: BitmapName -> Handle -> FilePath -> IO ()
+runConversion name bmpHandle outfile = do
 
     -- putStrLn "running..."
 
@@ -177,7 +177,7 @@ runConversion name bmpHandle xpmHandle = do
     let xpmdata = bmpToXpm name bmpdata
     -- putStrLn$ "Xpm conversion result size: " ++ show (BLC.length xpmdata)
 
-    writeXpmFile xpmHandle xpmdata
+    withFile outfile WriteMode (`writeXpmFile` xpmdata)
 
 -----------------------------------------------------------------------------
 
