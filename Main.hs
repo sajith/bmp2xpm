@@ -285,14 +285,16 @@ type XpmHeader   = BLC.ByteString
 -----------------------------------------------------------------------------
 
 makeXpm :: BitmapName -> BmpFile -> XpmData
-makeXpm name (BmpFile _ info bitmap) = xpmData -- TODO: do this correctly
+makeXpm name (BmpFile _ info bitmap) = xpmData
     where
-        header       = xpmFormHeader name info
-        xpmBitmap    = translateBitmap bitmap
-        xpmColors    = BLC.concat xpmColorLines
-        xpmHeader    = BLC.append header xpmColors
-        xpmBody      = BLC.append xpmHeader xpmBitmap
-        xpmData      = BLC.append xpmBody (BLC.pack "\n};")
+        xpmLeader = xpmFormHeader name info
+        colorStr  = BLC.pack "/* colors */\n"
+        xpmColors = BLC.append colorStr (BLC.concat xpmColorLines)
+        xpmHeader = BLC.append xpmLeader xpmColors
+        pixelStr  = BLC.pack "/* pixels */\n"
+        xpmBitmap = BLC.append pixelStr (translateBitmap bitmap)
+        xpmBody   = BLC.append xpmHeader xpmBitmap
+        xpmData   = BLC.append xpmBody (BLC.pack "\n};")
 
 -----------------------------------------------------------------------------
 
