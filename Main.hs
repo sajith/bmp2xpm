@@ -233,11 +233,8 @@ instance Eq BmpPixel where
     (==) (BmpPixel r g b) (BmpPixel x y z) = r == x && g == y && b == z
     (/=) a b = not $ (==) a b
 
--- Pixels are laid out in rows.
-type BmpRow    = [BmpPixel]
-
--- Bitmap data is a row of rows.
-type BmpBitmap = [BmpRow]
+type BmpRow    = [BmpPixel] -- Pixels are laid out in rows.
+type BmpBitmap = [BmpRow]   -- Bitmap data is a row of rows.
 
 -- And voila!  We have a BMP file.
 data BmpFile = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
