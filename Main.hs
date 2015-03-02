@@ -174,7 +174,7 @@ runConversion name bmpHandle xpmHandle = do
     unless (bmpCompressionSupported bmpinfo) $
         error "Can't run conversion: I don't know how to handle compressed bitmaps."
 
-    let xpmdata = makeXpm name bmpdata
+    let xpmdata = bmpToXpm name bmpdata
     -- putStrLn$ "Xpm conversion result size: " ++ show (BLC.length xpmdata)
 
     writeXpmFile xpmHandle xpmdata
@@ -351,8 +351,8 @@ type XpmColorMap  = M.Map XpmPaletteColor XpmPixel
 
 -----------------------------------------------------------------------------
 
-makeXpm :: BitmapName -> BmpFile -> XpmData
-makeXpm name (BmpFile _ info bitmap) = xpmData
+bmpToXpm :: BitmapName -> BmpFile -> XpmData
+bmpToXpm name (BmpFile _ info bitmap) = xpmData
     where
         xpmLeader = xpmFormHeader name info
         colorStr  = BLC.pack "/* colors */\n"
