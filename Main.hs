@@ -46,7 +46,7 @@ import           System.IO
 
 import           Data.Binary.Get       (Get, getWord16le, getWord32le, getWord8,
                                         runGet)
-import           Data.Char             (ord)
+import           Data.Char             (chr, ord)
 import           Data.List             (group)
 import qualified Data.Map              as M
 
@@ -279,7 +279,9 @@ getBmpRow rownum width bs = row
 
 -----------------------------------------------------------------------------
 
-type XpmData   = BLC.ByteString
+type XpmData     = BLC.ByteString
+type XpmIndex    = BLC.ByteString
+type XpmHeader   = BLC.ByteString
 
 -----------------------------------------------------------------------------
 
@@ -295,32 +297,22 @@ makeXpm name (BmpFile _ info bitmap) = xpmData -- TODO: do this correctly
 
 -----------------------------------------------------------------------------
 
-type XpmIndex    = BLC.ByteString
-
------------------------------------------------------------------------------
+xpmChrRange :: String
+xpmChrRange = map chr [48..124]
 
 -- xpmChrRange :: String
--- xpmChrRange = map chr [48..124]
-
--- This range mimics imagemagick's output.
-xpmChrRange :: String
-xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
-              "qwertyuipasdfghjklzxcvbnmMNBVCZASDFGHJKLPIUYTREWQ" ++
-              "!~^/()_`'][{}|"
+-- xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
+--               "qwertyuipasdfghjklzxcvbnmMNBVCZASDFGHJKLPIUYTREWQ" ++
+--               "!~^/()_`'][{}|"
 
 -- TODO: rewrite this mawky stuff.
 xpmIndices :: [XpmIndex]
 xpmIndices = map BLC.pack $ oneLetters ++ twoLetters xpmChrRange
     where
         oneLetters = group xpmChrRange
-        -- TODO: rewrite this.
         twoLetters :: String -> [String]
         twoLetters []     = group ""
         twoLetters (x:xs) = map (\c -> c ++ [x]) (group xs) ++ twoLetters xs
-
------------------------------------------------------------------------------
-
-type XpmHeader = BLC.ByteString
 
 -----------------------------------------------------------------------------
 
