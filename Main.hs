@@ -22,13 +22,14 @@
 
  TODO:
 
-  [ ] handle -ve heights (which changes how scanlines are stored)
-  [ ] handle scanline padding, if present.
-  [ ] Use parallelsim and/or concurrency.
-  [ ] Measure space usage, try pipes/conduit.
-  [ ] More useful debug/error messages.
-  [ ] Use exceptions instead of 'error'.
-  [ ] Documentation.
+  - Use Vectors instead of lists.
+  - handle -ve heights (which changes how scanlines are stored).
+  - handle scanline padding, if present.
+  - Use parallelsim and/or concurrency.
+  - Measure space usage.
+  - Use pipes/conduit, if necessary.
+  - Use more useful debug/error messages.
+  - Use exceptions instead of 'error'.
 
 --}
 
