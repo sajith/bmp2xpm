@@ -491,11 +491,14 @@ paletteApprox c pos =
 xpmColorMap :: XpmColorMap
 xpmColorMap = M.fromList $ zip xpmPalette xpmPixels
 
-xpmColorLines :: [XpmColorRow]
-xpmColorLines = map (uncurry xpmColorLine) $ M.toList xpmColorMap
+-----------------------------------------------------------------------------
 
-xpmColorLine :: XpmPaletteColor -> XpmPixel -> XpmColorRow
-xpmColorLine pc px = BLC.pack $ printf "\"%2v c #%06X\",\n" (BLC.unpack px) pc
+xpmColorLines :: [XpmColorRow]
+xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
+    where
+        colorLine :: XpmPaletteColor -> XpmPixel -> XpmColorRow
+        colorLine pc px = BLC.pack
+                          $ printf "\"%2v c #%06X\",\n" (BLC.unpack px) pc
 
 -----------------------------------------------------------------------------
 
