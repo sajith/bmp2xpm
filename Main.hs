@@ -22,12 +22,13 @@
 
  TODO:
 
-  - Use Vectors instead of lists.
-  - handle -ve heights (which changes how scanlines are stored).
-  - handle scanline padding, if present.
   - Use parallelsim and/or concurrency.
   - Measure space usage.
   - Use pipes/conduit, if necessary.
+  - Use Vectors instead of lists.
+  - Use better ways to build bytestrings.
+  - Handle -ve heights (which changes how scanlines are stored).
+  - Handle scanline padding, if present.
   - Use more useful debug/error messages.
   - Use exceptions instead of 'error'.
 
@@ -483,6 +484,7 @@ paletteApprox c pos =
 
 -----------------------------------------------------------------------------
 
+-- Generate "xx c #rrggbb" lines.
 xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
     where
@@ -492,7 +494,7 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 
 -----------------------------------------------------------------------------
 
--- XXX: This function is the hot-spot.
+-- XXX: This function is the hot-spot.  How can I improve it?
 translatePixel :: BmpPixel -> XpmPixel
 translatePixel p = case M.lookup (bmpPixelToPalette p) xpmColorMap of
                         Just c  -> BLC.pack $ printf "%2v" (BLC.unpack c)
@@ -500,6 +502,7 @@ translatePixel p = case M.lookup (bmpPixelToPalette p) xpmColorMap of
 
 -----------------------------------------------------------------------------
 
+-- Translate from BMP bitmap to XPM bitmap.
 translateBitmap :: BmpBitmap -> XpmBitmap
 translateBitmap rows = BLC.intercalate (BLC.pack ",\n")
                        $ map translateRow rows
