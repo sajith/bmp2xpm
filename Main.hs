@@ -511,7 +511,8 @@ translatePixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
 -----------------------------------------------------------------------------
 
 translateBitmap :: BmpBitmap -> XpmBitmap
-translateBitmap rows = BLC.intercalate (BLC.pack ",\n") $ map translateRow rows
+translateBitmap rows = BLC.intercalate (BLC.pack ",\n")
+                       $ map translateRow rows
     where
         translateRow row = quote $ BLC.concat $ map translatePixel row
 
