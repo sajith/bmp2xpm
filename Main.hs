@@ -89,10 +89,7 @@ process infile outfile = do
     e2 <- isFileWritable outfile
     unless e2 $ error $ "Can't write to output file " ++ show outfile
 
-    let name = takeBaseName infile
-
-    withBinaryFile infile ReadMode
-        (\h -> runConversion name h outfile)
+    runConversion infile outfile
 
     putStrLn $ infile ++ " -> " ++ outfile ++ " conversion done."
 
@@ -120,6 +117,59 @@ isFileWritable f = do
 
 -----------------------------------------------------------------------------
 
+runConversion :: FilePath -> FilePath -> IO ()
+runConversion infile outfile = do
+    bmpdata <- readBmpFile infile
+
+    let name    = takeBaseName infile
+        xpmdata = bmpToXpm name bmpdata
+    -- putStrLn$ "Xpm conversion result size: " ++ show (BLC.length xpmdata)
+
+    withFile outfile WriteMode (`writeXpmFile` xpmdata)
+
+-----------------------------------------------------------------------------
+
+readBmpFile :: FilePath -> IO BmpFile
+readBmpFile bf = withBinaryFile bf ReadMode readBmpH
+
+readBmpH :: Handle -> IO BmpFile
+readBmpH handle = do
+
+    checkFileSize handle
+
+    contents <- BL.hGetContents handle
+
+    -- TODO: do away with too many 'from...' calls
+    let bmpHdr  = runGet readBmpFileHeader contents
+        infoOff = fromInteger bmpFileHeaderSize
+        bmpInfo = runGet readBmpInfoHeader $ BL.drop infoOff contents
+        infoSz  = fromIntegral (infoHeaderSize bmpInfo)
+        bodyOff = fromInteger bmpFileHeaderSize + infoSz
+        bmpPix  = getBmpBitmap bmpInfo $ BL.drop bodyOff contents
+        bmpData = BmpFile bmpHdr bmpInfo bmpPix
+
+    when (fileType bmpHdr /= bmpFileType) $
+        error "File type doesn't match: input file is not a BMP file."
+
+    -- putStrLn$ "BMP header  : " ++ show bmphdr
+    -- putStrLn$ "BMP info    : " ++ show bmpinfo
+    -- putStrLn$ "Body length : " ++ show (BL.length bmpbody)
+    -- putStrLn$ "Read " ++ show (length (concat pixels)) ++ " pixels ("
+    --         ++ show (3 * length (concat pixels)) ++ " bytes)"
+
+    checkRows bmpPix
+
+    unless (bmpColorDepthSupported bmpInfo) $
+        error $ "Can't run conversion: I don't know how to handle "
+                ++ show (bitsPerPixel bmpInfo) ++ "-bit pixels."
+
+    unless (bmpCompressionSupported bmpInfo) $
+        error "Can't run conversion: I don't know how to handle compressed bitmaps."
+
+    return bmpData
+
+-----------------------------------------------------------------------------
+
 checkFileSize :: Handle -> IO ()
 checkFileSize inh = do
     size <- hFileSize inh
@@ -130,54 +180,11 @@ checkFileSize inh = do
 
 -- TODO: temporary debugging function, remove this.
 -- Checks all rows in the bitmap are of the same length.
-checkRows :: BmpFile -> IO ()
-checkRows (BmpFile _ _ pixels) =
-    if length (group $ map length pixels) == 1
+checkRows :: BmpBitmap -> IO ()
+checkRows bitmap =
+    if length (group $ map length bitmap) == 1
         then putStrLn "Bitmap OK"
         else error "Problem: irregular bitmap"
-
------------------------------------------------------------------------------
-
-runConversion :: BitmapName -> Handle -> FilePath -> IO ()
-runConversion name bmpHandle outfile = do
-
-    -- putStrLn "running..."
-
-    checkFileSize bmpHandle
-
-    contents <- BL.hGetContents bmpHandle
-
-    -- TODO: do away with too many 'from...' calls
-    let bmphdr  = runGet readBmpFileHeader contents
-        infoOff = fromInteger bmpFileHeaderSize
-        bmpinfo = runGet readBmpInfoHeader $ BL.drop infoOff contents
-        bodyOff = fromInteger bmpFileHeaderSize + fromIntegral (infoHeaderSize bmpinfo)
-        bmpbody = BL.drop bodyOff contents
-        pixels  = getBmpBitmap bmpinfo bmpbody
-        bmpdata = BmpFile bmphdr bmpinfo pixels
-
-    when (fileType bmphdr /= bmpFileType) $
-        error "File type doesn't match: input file is not a BMP file."
-
-    -- putStrLn$ "BMP header  : " ++ show bmphdr
-    -- putStrLn$ "BMP info    : " ++ show bmpinfo
-    -- putStrLn$ "Body length : " ++ show (BL.length bmpbody)
-    -- putStrLn$ "Read " ++ show (length (concat pixels)) ++ " pixels ("
-    --         ++ show (3 * length (concat pixels)) ++ " bytes)"
-
-    checkRows bmpdata
-
-    unless (bmpColorDepthSupported bmpinfo) $
-        error $ "Can't run conversion: I don't know how to handle "
-                ++ show (bitsPerPixel bmpinfo) ++ "-bit pixels."
-
-    unless (bmpCompressionSupported bmpinfo) $
-        error "Can't run conversion: I don't know how to handle compressed bitmaps."
-
-    let xpmdata = bmpToXpm name bmpdata
-    -- putStrLn$ "Xpm conversion result size: " ++ show (BLC.length xpmdata)
-
-    withFile outfile WriteMode (`writeXpmFile` xpmdata)
 
 -----------------------------------------------------------------------------
 
