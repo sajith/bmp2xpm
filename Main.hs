@@ -27,7 +27,6 @@
   - Use pipes/conduit, if necessary.
   - Use Vectors instead of lists.
   - Use better ways to build bytestrings.
-  - Handle -ve heights (which changes how scanlines are stored).
   - Handle scanline padding, if present.
   - Use more useful debug/error messages.
   - Use exceptions instead of 'error'.
@@ -251,7 +250,10 @@ getBmpBitmap hdr bs = pixels
     where
         width  = fromIntegral $ imageWidth hdr
         height = fromIntegral $ imageHeight hdr
-        pixels = map (\h -> getBmpRow h width bs) (reverse [0..(height-1)])
+        range  = if imageHeight hdr > 0
+                 then reverse [0..(height-1)]
+                 else [0..(height-1)]
+        pixels = map (\h -> getBmpRow h width bs) range
 
 -----------------------------------------------------------------------------
 
