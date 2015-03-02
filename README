@@ -12,7 +12,7 @@ To build and run this program, do this:
 
 For a profiling build, do this:
 
-    ghc -O2 -rtsopts -threaded Main.hs -o Main.exe
+    ghc -O2 -rtsopts -threaded -prof Main.hs -o Main.exe
 
 We'll need profiling libraries.  Install ghc-prof!
 
