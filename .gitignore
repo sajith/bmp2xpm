@@ -1,9 +1,14 @@
 *.hi
 *.o
 *.exe
+*.eventlog
+a.out
+
+*.bmp
 *.xpm
-dist/
 samples/
 
-/a.out
+dist/
+.cabal-sandbox/
+cabal.sandbox.config
 
