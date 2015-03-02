@@ -164,7 +164,8 @@ readBmpH handle = do
                 ++ show (bitsPerPixel bmpInfo) ++ "-bit pixels."
 
     unless (bmpCompressionSupported bmpInfo) $
-        error "Can't run conversion: I don't know how to handle compressed bitmaps."
+        error $ "Can't run conversion: "
+                ++ "I don't know how to handle compressed bitmaps."
 
     return bmpData
 
