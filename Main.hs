@@ -226,12 +226,7 @@ data BmpPixel = BmpPixel {
       blue  :: Word8
     , green :: Word8
     , red   :: Word8
-    } deriving (Show, Ord)
-
--- Need this to 'nub' the pixel array.
-instance Eq BmpPixel where
-    (==) (BmpPixel r g b) (BmpPixel x y z) = r == x && g == y && b == z
-    (/=) a b = not $ (==) a b
+    } deriving (Show)
 
 type BmpRow    = [BmpPixel] -- Pixels are laid out in rows.
 type BmpBitmap = [BmpRow]   -- Bitmap data is a row of rows.
