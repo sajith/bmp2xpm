@@ -268,6 +268,8 @@ getBmpBitmap hdr bs = pixels
         height    = fromIntegral $ imageHeight hdr
         pixels    = map (\h -> getBmpRow h width bs) (reverse [0..(height-1)])
 
+-----------------------------------------------------------------------------
+
 getBmpRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpRow
 getBmpRow rownum width bs = row
     where
@@ -275,6 +277,64 @@ getBmpRow rownum width bs = row
         offsets     = [0,3..(width-1)*3]
         newOffset o = BL.drop (fromIntegral o) bs'
         row         = map (runGet readBmpPixel . newOffset) offsets
+
+-----------------------------------------------------------------------------
+
+-- | Read BMP file header, the first 14 bytes.
+readBmpFileHeader :: Get BmpFileHeader
+readBmpFileHeader = do
+    typ  <- getWord16le
+    sz   <- getWord32le
+    rsv1 <- getWord16le
+    rsv2 <- getWord16le
+    off  <- getWord32le
+    return BmpFileHeader { fileType  = typ
+                         , fileSize  = sz
+                         , reserved1 = rsv1
+                         , reserved2 = rsv2
+                         , offset    = off }
+
+-----------------------------------------------------------------------------
+
+-- | Read BMP "info" header, proceeding the file header.
+readBmpInfoHeader :: Get BmpInfoHeader
+readBmpInfoHeader = do
+    size   <- getWord32le
+    width  <- getWord32le
+    height <- getWord32le
+    planes <- getWord16le
+    bits   <- getWord16le
+    compr  <- getWord32le
+    bsize  <- getWord32le
+    xres   <- getWord32le
+    yres   <- getWord32le
+    usedc  <- getWord32le
+    mainc  <- getWord32le
+    return BmpInfoHeader { infoHeaderSize  = size
+                         , imageWidth      = fromIntegral width
+                         , imageHeight     = fromIntegral height
+                         , colorPlanes     = planes
+                         , bitsPerPixel    = bits
+                         , compression     = compr
+                         , bitmapSize      = bsize
+                         , xResolution     = xres
+                         , yResolution     = yres
+                         , colorsUsed      = usedc
+                         , colorsImportant = mainc
+                         }
+
+-----------------------------------------------------------------------------
+
+-- | Read (uncompressed) pixel information
+readBmpPixel :: Get BmpPixel
+readBmpPixel = do
+    b <- getWord8
+    g <- getWord8
+    r <- getWord8
+    return BmpPixel { blue  = b
+                    , green = g
+                    , red   = r
+                    }
 
 -----------------------------------------------------------------------------
 
@@ -335,64 +395,6 @@ xpmFormHeader name info = BLC.pack $
 
 writeXpmFile :: Handle -> XpmData -> IO ()
 writeXpmFile = BLC.hPut
-
------------------------------------------------------------------------------
-
--- | Read BMP file header, the first 14 bytes.
-readBmpFileHeader :: Get BmpFileHeader
-readBmpFileHeader = do
-    typ  <- getWord16le
-    sz   <- getWord32le
-    rsv1 <- getWord16le
-    rsv2 <- getWord16le
-    off  <- getWord32le
-    return BmpFileHeader { fileType  = typ
-                         , fileSize  = sz
-                         , reserved1 = rsv1
-                         , reserved2 = rsv2
-                         , offset    = off }
-
------------------------------------------------------------------------------
-
--- | Read BMP "info" header, proceeding the file header.
-readBmpInfoHeader :: Get BmpInfoHeader
-readBmpInfoHeader = do
-    size   <- getWord32le
-    width  <- getWord32le
-    height <- getWord32le
-    planes <- getWord16le
-    bits   <- getWord16le
-    compr  <- getWord32le
-    bsize  <- getWord32le
-    xres   <- getWord32le
-    yres   <- getWord32le
-    usedc  <- getWord32le
-    mainc  <- getWord32le
-    return BmpInfoHeader { infoHeaderSize  = size
-                         , imageWidth      = fromIntegral width
-                         , imageHeight     = fromIntegral height
-                         , colorPlanes     = planes
-                         , bitsPerPixel    = bits
-                         , compression     = compr
-                         , bitmapSize      = bsize
-                         , xResolution     = xres
-                         , yResolution     = yres
-                         , colorsUsed      = usedc
-                         , colorsImportant = mainc
-                         }
-
------------------------------------------------------------------------------
-
--- | Read (uncompressed) pixel information
-readBmpPixel :: Get BmpPixel
-readBmpPixel = do
-    b <- getWord8
-    g <- getWord8
-    r <- getWord8
-    return BmpPixel { blue  = b
-                    , green = g
-                    , red   = r
-                    }
 
 -----------------------------------------------------------------------------
 
