@@ -215,7 +215,7 @@ checkRows (BmpFile _ _ pixels) =
 runConversion :: BitmapName -> Handle -> Handle -> IO ()
 runConversion name bmpHandle xpmHandle = do
 
-    putStrLn "running..."
+    -- putStrLn "running..."
 
     checkFileSize bmpHandle
 
@@ -333,9 +333,7 @@ xpmFormHeader name info = BLC.pack $
 -----------------------------------------------------------------------------
 
 writeXpmFile :: Handle -> XpmData -> IO ()
-writeXpmFile handle body = do
-    putStrLn "Writing file..."
-    BLC.hPut handle body
+writeXpmFile = BLC.hPut
 
 -----------------------------------------------------------------------------
 
