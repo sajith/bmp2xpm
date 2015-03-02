@@ -125,7 +125,7 @@ runConversion infile outfile = do
         xpmdata = bmpToXpm name bmpdata
     -- putStrLn$ "Xpm conversion result size: " ++ show (BLC.length xpmdata)
 
-    withFile outfile WriteMode (`writeXpmFile` xpmdata)
+    withFile outfile WriteMode (`BLC.hPut` xpmdata)
 
 -----------------------------------------------------------------------------
 
@@ -351,6 +351,7 @@ type XpmColorMap  = M.Map XpmPaletteColor XpmPixel
 
 -----------------------------------------------------------------------------
 
+-- Convert BMP file to XPM file.
 bmpToXpm :: BitmapName -> BmpFile -> XpmData
 bmpToXpm name (BmpFile _ info bitmap) = xpmData
     where
@@ -365,13 +366,9 @@ bmpToXpm name (BmpFile _ info bitmap) = xpmData
 
 -----------------------------------------------------------------------------
 
+-- XPM pixels are chosen from this range.
 xpmChrRange :: String
 xpmChrRange = map chr [48..124]
-
--- xpmChrRange :: String
--- xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
---               "qwertyuipasdfghjklzxcvbnmMNBVCZASDFGHJKLPIUYTREWQ" ++
---               "!~^/()_`'][{}|"
 
 -- TODO: rewrite this mawky stuff.
 xpmPixels :: [XpmPixel]
@@ -384,11 +381,15 @@ xpmPixels = map BLC.pack $ oneLetters ++ twoLetters xpmChrRange
 
 -----------------------------------------------------------------------------
 
+-- One XPM "pixel" consists of two characters.
 xpmCharsPerPixel :: Integer
 xpmCharsPerPixel = 2
 
+-- Our XPM files use a 216-color palette.
 xpmNumColors :: Integer
 xpmNumColors = 216
+
+-----------------------------------------------------------------------------
 
 xpmFormHeader :: BitmapName -> BmpInfoHeader -> XpmHeader
 xpmFormHeader name info = BLC.pack $
@@ -397,11 +398,6 @@ xpmFormHeader name info = BLC.pack $
     ++ "/* columns rows colors chars-per-pixel */\n\""
     ++ show (imageWidth info) ++ " " ++ show (imageHeight info) ++ " "
     ++ show xpmNumColors ++ " " ++ show xpmCharsPerPixel ++ "\",\n"
-
------------------------------------------------------------------------------
-
-writeXpmFile :: Handle -> XpmData -> IO ()
-writeXpmFile = BLC.hPut
 
 -----------------------------------------------------------------------------
 
