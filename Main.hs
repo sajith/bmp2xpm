@@ -209,14 +209,15 @@ data BmpPixel = BmpPixel {
     , red   :: Word8
     } deriving (Show)
 
-type BitmapName   = String
-type BitmapWidth  = Integer
-type BitmapRowNum = Integer
 type BmpRow       = [BmpPixel] -- Pixels are laid out in rows.
 type BmpBitmap    = [BmpRow]   -- Bitmap data is a row of rows.
 
 -- And voila!  We have a BMP file.
 data BmpFile      = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
+
+type BitmapName   = String
+type BitmapWidth  = Integer
+type BitmapRowNum = Integer
 
 -----------------------------------------------------------------------------
 
