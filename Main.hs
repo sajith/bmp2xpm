@@ -502,6 +502,7 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 
 -----------------------------------------------------------------------------
 
+-- XXX: This function is the hot-spot.
 translatePixel :: BmpPixel -> XpmPixel
 translatePixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
                         Just c  -> BLC.pack $ printf "%2v" (BLC.unpack c)
