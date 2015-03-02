@@ -341,8 +341,6 @@ readBmpPixel = do
 type XpmData      = BLC.ByteString -- the whole file.
 
 type XpmHeader    = BLC.ByteString -- row, columns, colors, etc.
-type XpmIndex     = BLC.ByteString
-
 type XpmPixel     = BLC.ByteString -- two-character pixels.
 type XpmColorRow  = BLC.ByteString -- "pp c #bbggrr" line.
 type XpmBitmap    = BLC.ByteString -- bitmap.
@@ -374,8 +372,8 @@ xpmChrRange = map chr [48..124]
 --               "!~^/()_`'][{}|"
 
 -- TODO: rewrite this mawky stuff.
-xpmIndices :: [XpmIndex]
-xpmIndices = map BLC.pack $ oneLetters ++ twoLetters xpmChrRange
+xpmPixels :: [XpmPixel]
+xpmPixels = map BLC.pack $ oneLetters ++ twoLetters xpmChrRange
     where
         oneLetters = group xpmChrRange
         twoLetters :: String -> [String]
@@ -491,7 +489,7 @@ paletteApprox c pos =
 -----------------------------------------------------------------------------
 
 xpmColorMap :: XpmColorMap
-xpmColorMap = M.fromList $ zip xpmPalette xpmIndices
+xpmColorMap = M.fromList $ zip xpmPalette xpmPixels
 
 xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry xpmColorLine) $ M.toList xpmColorMap
