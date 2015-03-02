@@ -47,7 +47,7 @@ import           System.IO
 import           Data.Binary.Get       (Get, getWord16le, getWord32le, getWord8,
                                         runGet)
 import           Data.Char             (ord)
-import           Data.List             (group, intercalate)
+import           Data.List             (group)
 import qualified Data.Map              as M
 
 import           Data.Int              (Int32)
@@ -283,9 +283,9 @@ type XpmData   = BLC.ByteString
 
 -----------------------------------------------------------------------------
 
--- quote :: BLC.ByteString -> BLC.ByteString
--- quote bs = BLC.snoc (BLC.cons dq bs) dq
---            where dq = '\"'
+quote :: BLC.ByteString -> BLC.ByteString
+quote bs = BLC.snoc (BLC.cons dq bs) dq
+           where dq = '\"'
 
 -----------------------------------------------------------------------------
 
@@ -301,7 +301,7 @@ makeXpm name (BmpFile _ info bitmap) = xpmData -- TODO: do this correctly
 
 -----------------------------------------------------------------------------
 
-type XpmIndex    = String
+type XpmIndex    = BLC.ByteString
 
 -----------------------------------------------------------------------------
 
@@ -316,7 +316,7 @@ xpmChrRange = " .XoO+@#$%&*=-;:>,<1234567890" ++
 
 -- TODO: rewrite this mawky stuff.
 xpmIndices :: [XpmIndex]
-xpmIndices = oneLetters ++ twoLetters xpmChrRange
+xpmIndices = map BLC.pack $ oneLetters ++ twoLetters xpmChrRange
     where
         oneLetters = group xpmChrRange
         -- TODO: rewrite this.
@@ -496,7 +496,7 @@ paletteApprox c pos =
 
 -----------------------------------------------------------------------------
 
-type XpmPixel     = String
+type XpmPixel     = BLC.ByteString
 type XpmColorRow  = BLC.ByteString
 type XpmColorMap  = M.Map XpmPaletteColor XpmPixel
 type XpmBitmap    = BLC.ByteString
@@ -508,20 +508,20 @@ xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry xpmColorLine) $ M.toList xpmColorMap
 
 xpmColorLine :: XpmPaletteColor -> XpmPixel -> XpmColorRow
-xpmColorLine pc px = BLC.pack $ printf "\"%2v c #%06X\",\n" px pc
+xpmColorLine pc px = BLC.pack $ printf "\"%2v c #%06X\",\n" (BLC.unpack px) pc
 
 -----------------------------------------------------------------------------
 
 translatePixel :: BmpPixel -> XpmPixel
 translatePixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
-    Just c  -> printf "%2v" c
-    Nothing -> printf "%2v" "x"
+                        Just c  -> BLC.pack $ printf "%2v" (BLC.unpack c)
+                        Nothing -> BLC.pack $ printf "%2v" "x"
 
 -----------------------------------------------------------------------------
 
 translateBitmap :: BmpBitmap -> XpmBitmap
-translateBitmap bitmap = BLC.pack
-                        $ intercalate ",\n"
-                        $ map (show . concatMap translatePixel) bitmap
+translateBitmap rows = BLC.intercalate (BLC.pack ",\n") $ map translateRow rows
+    where
+        translateRow row = quote $ BLC.concat $ map translatePixel row
 
 -----------------------------------------------------------------------------
