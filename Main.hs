@@ -245,6 +245,7 @@ bmpColorDepthSupported info = bitsPerPixel info == 24
 
 -----------------------------------------------------------------------------
 
+-- Read the entire bitmap file.
 getBmpBitmap :: BmpInfoHeader -> BL.ByteString -> BmpBitmap
 getBmpBitmap hdr bs = pixels
     where
@@ -257,6 +258,7 @@ getBmpBitmap hdr bs = pixels
 
 -----------------------------------------------------------------------------
 
+-- Read a scanline of BMP pixels.
 getBmpRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpRow
 getBmpRow rownum width bs = row
     where
