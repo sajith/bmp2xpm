@@ -60,80 +60,6 @@ import qualified Data.ByteString.Lazy  as BL
 
 ------------------------------------------------------------------------------------
 
--- BMP version 3.x data types.
-
--- | The 14 byte BMP file header.
-data BmpFileHeader = BmpFileHeader {
-      fileType  :: Word16 -- Magic identifier. Should be "BM" (0x4d42).
-    , fileSize  :: Word32 -- File size in bytes.
-    , reserved1 :: Word16 -- Reserved field, always 0.
-    , reserved2 :: Word16 -- Reserved field, always 0.
-    , offset    :: Word32 -- Offset to image data, in bytes.
-    } deriving Show
-
--- | The 14-byte BMP file is followed by this "info" header.
-data BmpInfoHeader = BmpInfoHeader {
-      infoHeaderSize  :: Word32 -- Size of info header, in bytes.
-    , imageWidth      :: Int32  -- Width of image, in pixels.
-    , imageHeight     :: Int32  -- Height of image, in pixels.
-    , colorPlanes     :: Word16 -- Number of color planes.  Always 1 for BMP files.
-    , bitsPerPixel    :: Word16 -- Number of bits per pixel. legal values: 1,4,8,24.
-    , compression     :: Word32 -- Compression method used.
-    , bitmapSize      :: Word32 -- Size of bitmap image data, in bytes.
-    , xResolution     :: Word32 -- Horizontal resolution, in pixels per meter.
-    , yResolution     :: Word32 -- Vertical resolution, in pixels per meter.
-    , colorsUsed      :: Word32 -- Number of colors in the bitmap.
-    , colorsImportant :: Word32 -- Min. number of important colors.
-    } deriving Show
-
--- | Pixel representation for uncompressed BMP files.
-data BmpPixel = BmpPixel {
-      blue  :: Word8
-    , green :: Word8
-    , red   :: Word8
-    } deriving (Show, Ord)
-
--- | Need this to 'nub' the pixel array.
-instance Eq BmpPixel where
-    (==) (BmpPixel r g b) (BmpPixel x y z) = r == x && g == y && b == z
-    (/=) a b = not $ (==) a b
-
--- | Pixels are laid out in rows.
-type BmpRow    = [BmpPixel]
-
--- | Bitmap data is a row of rows.
-type BmpBitmap = [BmpRow]
-
--- | And voila!  We have a BMP file.
-data BmpFile = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
-
------------------------------------------------------------------------------
-
--- | BMP file header is 14 bytes.
-bmpFileHeaderSize :: Integer
-bmpFileHeaderSize = 14
-
--- | BMP filetype magic (0x4d42, or 19778 in decimal)
-bmpFileType :: Word16
-bmpFileType = toEnum $ ord 'M' * 256 + ord 'B'
-
--- | 'compression' field of info header can have the following values:
---
---   0 - no compression
---   1 - 8-bit run length encoding
---   2 - 4-bit run length encoding
---   3 - RGB bitmap with mask
---
--- Only uncompressed BMP files are supported.
-bmpCompressionSupported :: BmpInfoHeader -> Bool
-bmpCompressionSupported info = compression info == 0
-
--- | Only 24-bit pixels are supported.
-bmpColorDepthSupported :: BmpInfoHeader -> Bool
-bmpColorDepthSupported info = bitsPerPixel info == 24
-
------------------------------------------------------------------------------
-
 main :: IO ()
 main = do
    args <- getArgs
@@ -258,6 +184,80 @@ runConversion name bmpHandle xpmHandle = do
 type BitmapName   = String
 type BitmapWidth  = Integer
 type BitmapRowNum = Integer
+
+-----------------------------------------------------------------------------
+
+-- BMP version 3.x data types.
+
+-- | The 14 byte BMP file header.
+data BmpFileHeader = BmpFileHeader {
+      fileType  :: Word16 -- Magic identifier. Should be "BM" (0x4d42).
+    , fileSize  :: Word32 -- File size in bytes.
+    , reserved1 :: Word16 -- Reserved field, always 0.
+    , reserved2 :: Word16 -- Reserved field, always 0.
+    , offset    :: Word32 -- Offset to image data, in bytes.
+    } deriving Show
+
+-- | The 14-byte BMP file is followed by this "info" header.
+data BmpInfoHeader = BmpInfoHeader {
+      infoHeaderSize  :: Word32 -- Size of info header, in bytes.
+    , imageWidth      :: Int32  -- Width of image, in pixels.
+    , imageHeight     :: Int32  -- Height of image, in pixels.
+    , colorPlanes     :: Word16 -- Number of color planes.  Always 1 for BMP files.
+    , bitsPerPixel    :: Word16 -- Number of bits per pixel. legal values: 1,4,8,24.
+    , compression     :: Word32 -- Compression method used.
+    , bitmapSize      :: Word32 -- Size of bitmap image data, in bytes.
+    , xResolution     :: Word32 -- Horizontal resolution, in pixels per meter.
+    , yResolution     :: Word32 -- Vertical resolution, in pixels per meter.
+    , colorsUsed      :: Word32 -- Number of colors in the bitmap.
+    , colorsImportant :: Word32 -- Min. number of important colors.
+    } deriving Show
+
+-- | Pixel representation for uncompressed BMP files.
+data BmpPixel = BmpPixel {
+      blue  :: Word8
+    , green :: Word8
+    , red   :: Word8
+    } deriving (Show, Ord)
+
+-- | Need this to 'nub' the pixel array.
+instance Eq BmpPixel where
+    (==) (BmpPixel r g b) (BmpPixel x y z) = r == x && g == y && b == z
+    (/=) a b = not $ (==) a b
+
+-- | Pixels are laid out in rows.
+type BmpRow    = [BmpPixel]
+
+-- | Bitmap data is a row of rows.
+type BmpBitmap = [BmpRow]
+
+-- | And voila!  We have a BMP file.
+data BmpFile = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
+
+-----------------------------------------------------------------------------
+
+-- | BMP file header is 14 bytes.
+bmpFileHeaderSize :: Integer
+bmpFileHeaderSize = 14
+
+-- | BMP filetype magic (0x4d42, or 19778 in decimal)
+bmpFileType :: Word16
+bmpFileType = toEnum $ ord 'M' * 256 + ord 'B'
+
+-- | 'compression' field of info header can have the following values:
+--
+--   0 - no compression
+--   1 - 8-bit run length encoding
+--   2 - 4-bit run length encoding
+--   3 - RGB bitmap with mask
+--
+-- Only uncompressed BMP files are supported.
+bmpCompressionSupported :: BmpInfoHeader -> Bool
+bmpCompressionSupported info = compression info == 0
+
+-- | Only 24-bit pixels are supported.
+bmpColorDepthSupported :: BmpInfoHeader -> Bool
+bmpColorDepthSupported info = bitsPerPixel info == 24
 
 -----------------------------------------------------------------------------
 
