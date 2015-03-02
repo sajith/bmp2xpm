@@ -10,3 +10,9 @@ To build and run this program, do this:
     cabal run
     ./dist/build/bmp2xpm/bmp2xpm input.bmp output.xpm
 
+For a profiling build, do this:
+
+    ghc -O2 -rtsopts -threaded Main.hs -o Main.exe
+
+We'll need profiling libraries.  Install ghc-prof!
+
