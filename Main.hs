@@ -457,16 +457,19 @@ xpmPalette =
     , 0xffff00, 0xffff33, 0xffff66, 0xffff99, 0xffffcc, 0xffffff
     ]
 
+-- The `distance' between two adjacent colors in the palette.
 paletteDelta :: Integer
 paletteDelta = 0x33
 
 -----------------------------------------------------------------------------
 
+-- The palette-to-pixels lookup table.
 xpmColorMap :: XpmColorMap
 xpmColorMap = M.fromList $ zip xpmPalette xpmPixels
 
 -----------------------------------------------------------------------------
 
+-- Convert a BMP pixel to a color in our palette.
 bmpPixelToPalette :: BmpPixel -> XpmPaletteColor
 bmpPixelToPalette (BmpPixel b g r) = paletteColor
     where
@@ -475,6 +478,7 @@ bmpPixelToPalette (BmpPixel b g r) = paletteColor
               toInteger (paletteIndex r)
         paletteColor = xpmPalette !! fromInteger idx
 
+-- Find palette position from the given color intensity.
 paletteIndex :: Word8 -> Integer
 paletteIndex c =
     if c' `mod` paletteDelta == 0
@@ -484,6 +488,7 @@ paletteIndex c =
         c'  = toInteger c
         pos = c' `div` paletteDelta
 
+-- Find the closest palette color.
 paletteApprox :: Integer -> Integer -> XpmPaletteColor
 paletteApprox c pos =
     if d1 > d2 then pos+1 else pos
