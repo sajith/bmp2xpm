@@ -233,7 +233,6 @@ runConversion name bmpHandle xpmHandle = do
     when (fileType bmphdr /= bmpFileType) $
         error "File type doesn't match: input file is not a BMP file."
 
-
     -- putStrLn$ "BMP header  : " ++ show bmphdr
     -- putStrLn$ "BMP info    : " ++ show bmpinfo
     -- putStrLn$ "Body length : " ++ show (BL.length bmpbody)
