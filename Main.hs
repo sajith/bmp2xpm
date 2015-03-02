@@ -264,9 +264,9 @@ bmpColorDepthSupported info = bitsPerPixel info == 24
 getBmpBitmap :: BmpInfoHeader -> BL.ByteString -> BmpBitmap
 getBmpBitmap hdr bs = pixels
     where
-        width     = fromIntegral $ imageWidth hdr
-        height    = fromIntegral $ imageHeight hdr
-        pixels    = map (\h -> getBmpRow h width bs) (reverse [0..(height-1)])
+        width  = fromIntegral $ imageWidth hdr
+        height = fromIntegral $ imageHeight hdr
+        pixels = map (\h -> getBmpRow h width bs) (reverse [0..(height-1)])
 
 -----------------------------------------------------------------------------
 
