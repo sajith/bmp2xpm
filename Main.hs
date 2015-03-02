@@ -462,6 +462,13 @@ xpmPalette =
 paletteDelta :: Integer
 paletteDelta = 0x33
 
+-----------------------------------------------------------------------------
+
+xpmColorMap :: XpmColorMap
+xpmColorMap = M.fromList $ zip xpmPalette xpmPixels
+
+-----------------------------------------------------------------------------
+
 bmpToPaletteColor :: BmpPixel -> XpmPaletteColor
 bmpToPaletteColor (BmpPixel b g r) = paletteColor
     where
@@ -485,11 +492,6 @@ paletteApprox c pos =
     if d1 > d2 then pos+1 else pos
     where d1 = abs $ c - xpmPalette !! fromInteger pos
           d2 = abs $ c - xpmPalette !! fromInteger pos+1
-
------------------------------------------------------------------------------
-
-xpmColorMap :: XpmColorMap
-xpmColorMap = M.fromList $ zip xpmPalette xpmPixels
 
 -----------------------------------------------------------------------------
 
