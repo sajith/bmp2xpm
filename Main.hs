@@ -472,14 +472,13 @@ xpmColorMap = M.fromList $ zip xpmPalette xpmPixels
 bmpToPaletteColor :: BmpPixel -> XpmPaletteColor
 bmpToPaletteColor (BmpPixel b g r) = paletteColor
     where
-        b'  = toPaletteIndex b
-        g'  = toPaletteIndex g
-        r'  = toPaletteIndex r
-        idx = toInteger b' * 36 + toInteger g' * 6 + toInteger r'
+        idx = toInteger (paletteIndex b) * 36 +
+              toInteger (paletteIndex g) * 6 +
+              toInteger (paletteIndex r)
         paletteColor = xpmPalette !! fromInteger idx
 
-toPaletteIndex :: Word8 -> Integer
-toPaletteIndex c =
+paletteIndex :: Word8 -> Integer
+paletteIndex c =
     if c' `mod` paletteDelta == 0
         then pos
         else paletteApprox c' pos
