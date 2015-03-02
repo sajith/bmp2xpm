@@ -80,6 +80,24 @@ showUsage prog = hPutStrLn stderr $
 
 -----------------------------------------------------------------------------
 
+process :: FilePath -> FilePath -> IO ()
+process infile outfile = do
+
+    e1 <- isFileReadable infile
+    unless e1 $ error $ "Can't read input file " ++ show infile
+
+    e2 <- isFileWritable outfile
+    unless e2 $ error $ "Can't write to output file " ++ show outfile
+
+    let name = takeBaseName infile
+
+    withBinaryFile infile ReadMode
+        (withFile outfile WriteMode . runConversion name)
+
+    putStrLn $ infile ++ " -> " ++ outfile ++ " conversion done."
+
+-----------------------------------------------------------------------------
+
 isFileReadable :: FilePath -> IO Bool
 isFileReadable f = do
     e <- doesFileExist f
@@ -99,24 +117,6 @@ isFileWritable f = do
             putStrLn$ "File " ++ show f ++ " exists. Will overwrite."
         return $ writable p
     else return True
-
------------------------------------------------------------------------------
-
-process :: FilePath -> FilePath -> IO ()
-process infile outfile = do
-
-    e1 <- isFileReadable infile
-    unless e1 $ error $ "Can't read input file " ++ show infile
-
-    e2 <- isFileWritable outfile
-    unless e2 $ error $ "Can't write to output file " ++ show outfile
-
-    let name = takeBaseName infile
-
-    withBinaryFile infile ReadMode
-        (withFile outfile WriteMode . runConversion name)
-
-    putStrLn $ infile ++ " -> " ++ outfile ++ " conversion done."
 
 -----------------------------------------------------------------------------
 
