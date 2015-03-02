@@ -233,12 +233,12 @@ runConversion name bmpHandle xpmHandle = do
     when (fileType bmphdr /= bmpFileType) $
         error "File type doesn't match: input file is not a BMP file."
 
-    putStrLn$ "BMP header  : " ++ show bmphdr
-    putStrLn$ "BMP info    : " ++ show bmpinfo
-    putStrLn$ "Body length : " ++ show (BL.length bmpbody)
 
-    putStrLn$ "Read " ++ show (length (concat pixels)) ++ " pixels ("
-            ++ show (3 * length (concat pixels)) ++ " bytes)"
+    -- putStrLn$ "BMP header  : " ++ show bmphdr
+    -- putStrLn$ "BMP info    : " ++ show bmpinfo
+    -- putStrLn$ "Body length : " ++ show (BL.length bmpbody)
+    -- putStrLn$ "Read " ++ show (length (concat pixels)) ++ " pixels ("
+    --         ++ show (3 * length (concat pixels)) ++ " bytes)"
 
     checkRows bmpdata
 
@@ -250,7 +250,7 @@ runConversion name bmpHandle xpmHandle = do
         error "Can't run conversion: I don't know how to handle compressed bitmaps."
 
     let xpmdata = makeXpm name bmpdata
-    putStrLn$ "Xpm conversion result size: " ++ show (BLC.length xpmdata)
+    -- putStrLn$ "Xpm conversion result size: " ++ show (BLC.length xpmdata)
 
     writeXpmFile xpmHandle xpmdata
 
