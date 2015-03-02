@@ -469,8 +469,8 @@ xpmColorMap = M.fromList $ zip xpmPalette xpmPixels
 
 -----------------------------------------------------------------------------
 
-bmpToPaletteColor :: BmpPixel -> XpmPaletteColor
-bmpToPaletteColor (BmpPixel b g r) = paletteColor
+bmpPixelToPalette :: BmpPixel -> XpmPaletteColor
+bmpPixelToPalette (BmpPixel b g r) = paletteColor
     where
         idx = toInteger (paletteIndex b) * 36 +
               toInteger (paletteIndex g) * 6 +
@@ -505,7 +505,7 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 
 -- XXX: This function is the hot-spot.
 translatePixel :: BmpPixel -> XpmPixel
-translatePixel p = case M.lookup (bmpToPaletteColor p) xpmColorMap of
+translatePixel p = case M.lookup (bmpPixelToPalette p) xpmColorMap of
                         Just c  -> BLC.pack $ printf "%2v" (BLC.unpack c)
                         Nothing -> BLC.pack $ printf "%2v" "x"
 
