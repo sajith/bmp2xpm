@@ -176,12 +176,6 @@ checkFileSize inh = do
 
 -----------------------------------------------------------------------------
 
-type BitmapName   = String
-type BitmapWidth  = Integer
-type BitmapRowNum = Integer
-
------------------------------------------------------------------------------
-
 -- BMP version 3.x data types.
 
 -- The 14 byte BMP file header.
@@ -215,11 +209,14 @@ data BmpPixel = BmpPixel {
     , red   :: Word8
     } deriving (Show)
 
-type BmpRow    = [BmpPixel] -- Pixels are laid out in rows.
-type BmpBitmap = [BmpRow]   -- Bitmap data is a row of rows.
+type BitmapName   = String
+type BitmapWidth  = Integer
+type BitmapRowNum = Integer
+type BmpRow       = [BmpPixel] -- Pixels are laid out in rows.
+type BmpBitmap    = [BmpRow]   -- Bitmap data is a row of rows.
 
 -- And voila!  We have a BMP file.
-data BmpFile = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
+data BmpFile      = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
 
 -----------------------------------------------------------------------------
 
