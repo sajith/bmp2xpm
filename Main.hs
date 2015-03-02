@@ -119,21 +119,18 @@ isFileWritable f = do
 
 runConversion :: FilePath -> FilePath -> IO ()
 runConversion infile outfile = do
-    bmpdata <- readBmpFile infile
-
     let name    = takeBaseName infile
-        xpmdata = bmpToXpm name bmpdata
-    -- putStrLn$ "Xpm conversion result size: " ++ show (BLC.length xpmdata)
 
-    withFile outfile WriteMode (`BLC.hPut` xpmdata)
+    withBinaryFile infile ReadMode
+        (\inh -> do
+              bmpdata <- readBmpFile inh
+              withFile outfile WriteMode
+                  (\outh -> BLC.hPut outh (bmpToXpm name bmpdata)))
 
 -----------------------------------------------------------------------------
 
-readBmpFile :: FilePath -> IO BmpFile
-readBmpFile bf = withBinaryFile bf ReadMode readBmpH
-
-readBmpH :: Handle -> IO BmpFile
-readBmpH handle = do
+readBmpFile :: Handle -> IO BmpFile
+readBmpFile handle = do
 
     checkFileSize handle
 
