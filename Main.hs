@@ -283,12 +283,6 @@ type XpmData   = BLC.ByteString
 
 -----------------------------------------------------------------------------
 
-quote :: BLC.ByteString -> BLC.ByteString
-quote bs = BLC.snoc (BLC.cons dq bs) dq
-           where dq = '\"'
-
------------------------------------------------------------------------------
-
 makeXpm :: BitmapName -> BmpFile -> XpmData
 makeXpm name (BmpFile _ info bitmap) = xpmData -- TODO: do this correctly
     where
@@ -523,5 +517,11 @@ translateBitmap :: BmpBitmap -> XpmBitmap
 translateBitmap rows = BLC.intercalate (BLC.pack ",\n") $ map translateRow rows
     where
         translateRow row = quote $ BLC.concat $ map translatePixel row
+
+-----------------------------------------------------------------------------
+
+quote :: BLC.ByteString -> BLC.ByteString
+quote bs = BLC.snoc (BLC.cons dq bs) dq
+           where dq = '\"'
 
 -----------------------------------------------------------------------------
