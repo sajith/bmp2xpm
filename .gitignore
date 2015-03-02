@@ -2,6 +2,7 @@
 *.o
 *.exe
 *.eventlog
+*.prof
 a.out
 
 *.bmp
