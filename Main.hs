@@ -154,8 +154,6 @@ readBmpFile handle = do
     -- putStrLn$ "Read " ++ show (length (concat pixels)) ++ " pixels ("
     --         ++ show (3 * length (concat pixels)) ++ " bytes)"
 
-    checkRows bmpPix
-
     unless (bmpColorDepthSupported bmpInfo) $
         error $ "Can't run conversion: I don't know how to handle "
                 ++ show (bitsPerPixel bmpInfo) ++ "-bit pixels."
@@ -173,16 +171,6 @@ checkFileSize inh = do
     size <- hFileSize inh
     when (size < bmpFileHeaderSize) $
         error "Input file is too small to be a bitmap file."
-
------------------------------------------------------------------------------
-
--- TODO: temporary debugging function, remove this.
--- Checks all rows in the bitmap are of the same length.
-checkRows :: BmpBitmap -> IO ()
-checkRows bitmap =
-    if length (group $ map length bitmap) == 1
-        then putStrLn "Bitmap OK"
-        else error "Problem: irregular bitmap"
 
 -----------------------------------------------------------------------------
 
