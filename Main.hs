@@ -25,6 +25,7 @@
   - Use parallelsim and/or concurrency.
   - Measure space usage.
   - Use pipes/conduit, if necessary.
+  - Use Text instead of ByteString.Char8
   - Use Vectors instead of lists.
   - Use better ways to build bytestrings.
   - Handle scanline padding, if present.
@@ -37,27 +38,29 @@
 
 module Main (main) where
 
-import           Control.Monad         (unless, when)
+import           Control.Monad        (unless, when)
 
-import           System.Directory      (doesFileExist, getPermissions, readable,
-                                        writable)
-import           System.Environment    (getArgs, getProgName)
-import           System.FilePath       (replaceExtension, takeBaseName)
+import           System.Directory     (doesFileExist, getPermissions, readable,
+                                       writable)
+import           System.Environment   (getArgs, getProgName)
+import           System.FilePath      (replaceExtension, takeBaseName)
 import           System.IO
 
-import           Data.Binary.Get       (Get, getWord16le, getWord32le, getWord8,
-                                        runGet)
-import           Data.Char             (chr, ord)
-import           Data.List             (group)
-import qualified Data.Map              as M
+import           Data.Binary.Get      (Get, getWord16le, getWord32le, getWord8,
+                                       runGet)
+import           Data.Char            (chr, ord)
+import           Data.List            (group)
+import qualified Data.Map             as M
 
-import           Data.Int              (Int32)
-import           Data.Word             (Word16, Word32, Word8)
+import           Data.Int             (Int32)
+import           Data.Word            (Word16, Word32, Word8)
 
-import           Text.Printf           (printf)
+import           Text.Printf          (printf)
 
-import qualified Data.ByteString.Char8 as BLC
-import qualified Data.ByteString.Lazy  as BL
+import qualified Data.ByteString.Lazy as BL
+
+import qualified Data.Text            as T
+import qualified Data.Text.IO         as T (hPutStr)
 
 ------------------------------------------------------------------------------------
 
@@ -126,7 +129,7 @@ runConversion infile outfile = do
         (\inh -> do
               bmpdata <- readBmpFile inh
               withFile outfile WriteMode
-                  (\outh -> BLC.hPut outh (bmpToXpm name bmpdata)))
+                  (\outh -> T.hPutStr outh (bmpToXpm name bmpdata)))
 
 -----------------------------------------------------------------------------
 
@@ -329,12 +332,12 @@ readBmpPixel = do
 
 -- XPM v3 types.  Everything is a string!
 
-type XpmData      = BLC.ByteString -- the whole file.
+type XpmData      = T.Text -- the whole file.
 
-type XpmHeader    = BLC.ByteString -- rows, columns, colors, etc.
-type XpmPixel     = BLC.ByteString -- two-character pixels.
-type XpmColorRow  = BLC.ByteString -- "pp c #bbggrr" line.
-type XpmBitmap    = BLC.ByteString -- the actual xpm bitmap.
+type XpmHeader    = T.Text -- rows, columns, colors, etc.
+type XpmPixel     = T.Text -- two-character pixels.
+type XpmColorRow  = T.Text -- "pp c #bbggrr" line.
+type XpmBitmap    = T.Text -- the actual xpm bitmap.
 
 type XpmColorMap  = M.Map XpmPaletteColor XpmPixel
 
@@ -345,13 +348,13 @@ bmpToXpm :: BitmapName -> BmpFile -> XpmData
 bmpToXpm name (BmpFile _ info bitmap) = xpmData
     where
         xpmLeader = xpmFormHeader name info
-        colorStr  = BLC.pack "/* colors */\n"
-        xpmColors = BLC.append colorStr (BLC.concat xpmColorLines)
-        xpmHeader = BLC.append xpmLeader xpmColors
-        pixelStr  = BLC.pack "/* pixels */\n"
-        xpmBitmap = BLC.append pixelStr (translateBitmap bitmap)
-        xpmBody   = BLC.append xpmHeader xpmBitmap
-        xpmData   = BLC.append xpmBody (BLC.pack "\n};")
+        colorStr  = T.pack "/* colors */\n"
+        xpmColors = T.append colorStr (T.concat xpmColorLines)
+        xpmHeader = T.append xpmLeader xpmColors
+        pixelStr  = T.pack "/* pixels */\n"
+        xpmBitmap = T.append pixelStr (translateBitmap bitmap)
+        xpmBody   = T.append xpmHeader xpmBitmap
+        xpmData   = T.append xpmBody (T.pack "\n};")
 
 -----------------------------------------------------------------------------
 
@@ -361,7 +364,7 @@ xpmChrRange = map chr [48..124]
 
 -- TODO: rewrite this mawky stuff.
 xpmPixels :: [XpmPixel]
-xpmPixels = map BLC.pack $ oneLetters ++ twoLetters xpmChrRange
+xpmPixels = map T.pack $ oneLetters ++ twoLetters xpmChrRange
     where
         oneLetters = group xpmChrRange
         twoLetters :: String -> [String]
@@ -381,7 +384,7 @@ xpmNumColors = 216
 -----------------------------------------------------------------------------
 
 xpmFormHeader :: BitmapName -> BmpInfoHeader -> XpmHeader
-xpmFormHeader name info = BLC.pack $
+xpmFormHeader name info = T.pack $
     "/* XPM */\n"
     ++ "static char *" ++ name ++ "[] = {\n"
     ++ "/* columns rows colors chars-per-pixel */\n\""
@@ -491,30 +494,30 @@ xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
     where
         colorLine :: XpmPaletteColor -> XpmPixel -> XpmColorRow
-        colorLine pc px = BLC.pack
-                          $ printf "\"%2v c #%06X\",\n" (BLC.unpack px) pc
+        colorLine pc px = T.pack
+                          $ printf "\"%2v c #%06X\",\n" (T.unpack px) pc
 
 -----------------------------------------------------------------------------
 
 -- XXX: This function is the hot-spot.  How can I improve it?
 translatePixel :: BmpPixel -> XpmPixel
 translatePixel p = case M.lookup (bmpPixelToPalette p) xpmColorMap of
-                        Just c  -> BLC.pack $ printf "%2v" (BLC.unpack c)
-                        Nothing -> BLC.pack $ printf "%2v" "x"
+                        Just c  -> T.pack $ printf "%2v" (T.unpack c)
+                        Nothing -> T.pack $ printf "%2v" "x"
 
 -----------------------------------------------------------------------------
 
 -- Translate from BMP bitmap to XPM bitmap.
 translateBitmap :: BmpBitmap -> XpmBitmap
-translateBitmap rows = BLC.intercalate (BLC.pack ",\n")
+translateBitmap rows = T.intercalate (T.pack ",\n")
                        $ map translateRow rows
     where
-        translateRow row = quote $ BLC.concat $ map translatePixel row
+        translateRow row = quote $ T.concat $ map translatePixel row
 
 -----------------------------------------------------------------------------
 
-quote :: BLC.ByteString -> BLC.ByteString
-quote bs = BLC.snoc (BLC.cons dq bs) dq
+quote :: T.Text -> T.Text
+quote bs = T.snoc (T.cons dq bs) dq
            where dq = '\"'
 
 -----------------------------------------------------------------------------
