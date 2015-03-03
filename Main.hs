@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 ------------------------------------------------------------------------------------
 -- |
 -- Module      :  Main
@@ -58,8 +61,10 @@ import           Text.Printf          (printf)
 
 import qualified Data.ByteString.Lazy as BL
 
-import qualified Data.Text            as T
-import qualified Data.Text.IO         as T (hPutStr)
+import qualified Data.Text.Lazy       as T
+import qualified Data.Text.Lazy.IO    as T (hPutStr)
+
+import           Formatting           as F
 
 ------------------------------------------------------------------------------------
 
@@ -492,6 +497,7 @@ paletteApprox c pos =
 xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
     where
+        -- TODO: Replace the printf here with format, perhaps.
         colorLine :: XpmPaletteColor -> XpmPixel -> XpmColorRow
         colorLine pc px = T.pack
                           $ printf "\"%2v c #%06X\",\n" (T.unpack px) pc
@@ -501,8 +507,8 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 -- xxx: This function is the hot-spot.  How can I improve it?
 translatePixel :: BmpPixel -> XpmPixel
 translatePixel p = case M.lookup (bmpPixelToPalette p) xpmColorMap of
-                        Just c  -> T.pack $ printf "%2v" (T.unpack c)
-                        Nothing -> T.pack $ printf "%2v" "x"
+                        Just c  -> F.format (left 2 ' ' %. text) c
+                        Nothing -> "**"
 
 -----------------------------------------------------------------------------
 
