@@ -2,8 +2,9 @@
 *.o
 *.exe
 *.eventlog
-*.prof
+*.prof*
 a.out
+*_flymake.hs
 
 *.bmp
 *.xpm
