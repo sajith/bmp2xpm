@@ -22,7 +22,7 @@
 
  TODO:
 
-  - Use parallelsim and/or concurrency.
+  - Use parallelism.
   - Measure space usage.
   - Use pipes/conduit, if necessary.
   - Use Vectors instead of lists.
