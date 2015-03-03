@@ -377,8 +377,8 @@ xpmCharsPerPixel :: Integer
 xpmCharsPerPixel = 2
 
 -- Our XPM files use a 216-color palette.
-xpmNumColors :: Integer
-xpmNumColors = 216
+xpmNumColors :: Int
+xpmNumColors = length xpmPalette
 
 -----------------------------------------------------------------------------
 
