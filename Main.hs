@@ -498,7 +498,7 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 
 -----------------------------------------------------------------------------
 
--- XXX: This function is the hot-spot.  How can I improve it?
+-- xxx: This function is the hot-spot.  How can I improve it?
 translatePixel :: BmpPixel -> XpmPixel
 translatePixel p = case M.lookup (bmpPixelToPalette p) xpmColorMap of
                         Just c  -> T.pack $ printf "%2v" (T.unpack c)
