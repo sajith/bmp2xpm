@@ -25,7 +25,6 @@
   - Use parallelsim and/or concurrency.
   - Measure space usage.
   - Use pipes/conduit, if necessary.
-  - Use Text instead of ByteString.Char8
   - Use Vectors instead of lists.
   - Use better ways to build bytestrings.
   - Handle scanline padding, if present.
