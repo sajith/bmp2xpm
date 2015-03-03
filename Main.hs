@@ -515,8 +515,9 @@ translateBitmap rows = T.intercalate (T.pack ",\n")
 
 -----------------------------------------------------------------------------
 
+-- Put double quotes around text
 quote :: T.Text -> T.Text
-quote bs = T.snoc (T.cons dq bs) dq
+quote txt = T.snoc (T.cons dq txt) dq
            where dq = '\"'
 
 -----------------------------------------------------------------------------
