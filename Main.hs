@@ -13,8 +13,9 @@
 --
 -- A program that converts BMP (v3) files to XPM (v3) files.
 --
--- Only 24-bit pixels are supported.  Compression or ICC color
--- profiles is not supported.
+-- Nothing fancy here: Only 24-bit BGR888 pixels are supported.
+-- Compression or more than one planes or ICC color profiles are not
+-- supported.
 --
 -- That is silly enough, and something ImageMagick can trivially do.
 -- My intention however is to teach myself some Haskell parallelism.
