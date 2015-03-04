@@ -55,6 +55,9 @@ import qualified Data.Map             as M
 import           Data.Int             (Int32)
 import           Data.Word            (Word16, Word32, Word8)
 
+-- TODO: try unboxed vectors
+import qualified Data.Vector          as V
+
 import           Text.Printf          (printf)
 
 import qualified Data.ByteString.Lazy as BL
@@ -214,8 +217,8 @@ data BmpPixel = BmpPixel {
     , red   :: Word8
     } deriving (Show)
 
-type BmpRow       = [BmpPixel] -- Pixels are laid out in rows.
-type BmpBitmap    = [BmpRow]   -- Bitmap data is a row of rows.
+type BmpRow       = V.Vector BmpPixel -- Pixels are laid out in rows.
+type BmpBitmap    = V.Vector BmpRow   -- Bitmap data is a row of rows.
 
 -- And voila!  We have a BMP file.
 data BmpFile      = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
@@ -258,9 +261,9 @@ getBmpBitmap hdr bs = pixels
         width  = fromIntegral $ imageWidth hdr
         height = fromIntegral $ imageHeight hdr
         range  = if imageHeight hdr > 0
-                 then reverse [0..(height-1)]
-                 else [0..(height-1)]
-        pixels = map (\h -> getBmpRow h width bs) range
+                 then V.fromList $ reverse [0..(height-1)]
+                 else V.fromList $ [0..(height-1)]
+        pixels = V.map (\h -> getBmpRow h width bs) range
 
 -----------------------------------------------------------------------------
 
@@ -269,9 +272,9 @@ getBmpRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpRow
 getBmpRow rownum width bs = row
     where
         bs'         = BL.drop (fromIntegral (rownum*width*3)) bs
-        offsets     = [0,3..(width-1)*3]
+        offsets     = V.fromList [0,3..(width-1)*3]
         newOffset o = BL.drop (fromIntegral o) bs'
-        row         = map (runGet readBmpPixel . newOffset) offsets
+        row         = V.map (runGet readBmpPixel . newOffset) offsets
 
 -----------------------------------------------------------------------------
 
@@ -505,9 +508,10 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 
 -- Translate from BMP bitmap to XPM bitmap.
 translateBitmap :: BmpBitmap -> XpmBitmap
-translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
+translateBitmap rows = T.intercalate (T.pack ",\n")
+                       $ V.toList $ V.map translateRow rows
     where
-        translateRow row = quote $ T.concat $ map translatePixel row
+        translateRow row = quote $ T.concat $ V.toList $ V.map translatePixel row
 
 -----------------------------------------------------------------------------
 
