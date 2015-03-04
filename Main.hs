@@ -82,7 +82,7 @@ showUsage :: String -> IO ()
 showUsage prog = hPutStrLn stderr $
                  prog ++ " converts BMP files to XMP files.\n\n" ++
                  "Usage: " ++ prog ++ " input [output]\n\n" ++
-                 "input should be a Windows bitmap file."
+                 "input should be an uncompressed 24-bit Windows bitmap file."
 
 -----------------------------------------------------------------------------
 
