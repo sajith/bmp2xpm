@@ -1,7 +1,7 @@
 
 bmp2xpm is an embarrassingly simple image processing program which
 converts BMP (v3) files to XPM (v3) files.  I'm writing this to get a
-better idea of concurrent and parallel programming in Haskell.
+better idea of parallel programming in Haskell.
 
 To build and run this program, do this:
 

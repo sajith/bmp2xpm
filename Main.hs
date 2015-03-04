@@ -17,7 +17,7 @@
 -- profiles is not supported.
 --
 -- That is silly enough, and something ImageMagick can trivially do.
--- My intention however is to teach myself some Haskell concurrency.
+-- My intention however is to teach myself some Haskell parallelism.
 --
 ------------------------------------------------------------------------------------
 
