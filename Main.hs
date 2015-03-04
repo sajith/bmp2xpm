@@ -338,7 +338,7 @@ readBmpPixel = do
 type XpmData      = T.Text -- the whole file.
 
 type XpmHeader    = T.Text -- rows, columns, colors, etc.
-type XpmPixel     = T.Text -- two-character pixels.
+type XpmPixel     = T.Text -- two-character "pixels".
 type XpmColorRow  = T.Text -- "pp c #bbggrr" line.
 type XpmBitmap    = T.Text -- the actual xpm bitmap.
 
