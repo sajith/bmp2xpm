@@ -26,7 +26,8 @@
  TODO:
 
   - Use parallelism.
-  - Use Vectors instead of lists.
+  - Use (boxed/unboxed) Vectors instead of lists.
+  - Try Repa.
   - Measure space usage; use pipes/conduit, if necessary.
   - Handle scanline padding, if present.
   - Use more useful debug/error messages.
