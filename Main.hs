@@ -26,10 +26,8 @@
  TODO:
 
   - Use parallelism.
-  - Measure space usage.
-  - Use pipes/conduit, if necessary.
   - Use Vectors instead of lists.
-  - Use better ways to build bytestrings.
+  - Measure space usage; use pipes/conduit, if necessary.
   - Handle scanline padding, if present.
   - Use more useful debug/error messages.
   - Use exceptions instead of 'error'.
