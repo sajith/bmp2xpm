@@ -492,7 +492,7 @@ paletteApprox c pos =
 
 -----------------------------------------------------------------------------
 
--- Generate "cc c #rrggbb" lines.
+-- Generate "pp c #rrggbb" lines.
 xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
     where
