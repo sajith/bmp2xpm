@@ -7,8 +7,9 @@ To build and run this program, do this:
 
     cabal configure
     cabal build
-    cabal run
     ./dist/build/bmp2xpm/bmp2xpm input.bmp output.xpm
+
+Use a sandbox if you need to.
 
 For a profiling build, do this:
 
