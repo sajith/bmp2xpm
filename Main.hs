@@ -491,7 +491,7 @@ paletteApprox c pos =
 
 -----------------------------------------------------------------------------
 
--- Generate "xx c #rrggbb" lines.
+-- Generate "cc c #rrggbb" lines.
 xpmColorLines :: [XpmColorRow]
 xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
     where
@@ -499,6 +499,14 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
         colorLine :: XpmPaletteColor -> XpmPixel -> XpmColorRow
         colorLine pc px = T.pack
                           $ printf "\"%2v c #%06X\",\n" (T.unpack px) pc
+
+-----------------------------------------------------------------------------
+
+-- Translate from BMP bitmap to XPM bitmap.
+translateBitmap :: BmpBitmap -> XpmBitmap
+translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
+    where
+        translateRow row = quote $ T.concat $ map translatePixel row
 
 -----------------------------------------------------------------------------
 
@@ -510,16 +518,7 @@ translatePixel p = case M.lookup (bmpPixelToPalette p) xpmColorMap of
 
 -----------------------------------------------------------------------------
 
--- Translate from BMP bitmap to XPM bitmap.
-translateBitmap :: BmpBitmap -> XpmBitmap
-translateBitmap rows = T.intercalate (T.pack ",\n")
-                       $ map translateRow rows
-    where
-        translateRow row = quote $ T.concat $ map translatePixel row
-
------------------------------------------------------------------------------
-
--- Put double quotes around text
+-- Put double quotes around text.
 quote :: T.Text -> T.Text
 quote txt = T.snoc (T.cons dq txt) dq
            where dq = '\"'
