@@ -127,6 +127,7 @@ runConversion :: FilePath -> FilePath -> IO ()
 runConversion infile outfile = do
     let name    = takeBaseName infile
 
+    -- TODO: Leaves an empty output file when conversion fails. Fix.
     withBinaryFile infile ReadMode
         (\inh -> do
               bmpdata <- readBmpFile inh
