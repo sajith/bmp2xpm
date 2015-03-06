@@ -468,7 +468,8 @@ xpmColorMap = M.fromList $ zip xpmPalette xpmPixels
 bmpPixelToPalette :: BmpPixel -> XpmPaletteColor
 bmpPixelToPalette (BmpPixel b g r) = xpmPalette !! fromEnum idx
     where
-        idx = paletteIndex b * 36 + paletteIndex g * 6 + paletteIndex r
+        -- BGR -> RGB, sort of.
+        idx = paletteIndex r * 36 + paletteIndex g * 6 + paletteIndex b
 
 -- Find palette position from the given color intensity.
 paletteIndex :: Word8 -> Word8
