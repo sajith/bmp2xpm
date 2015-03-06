@@ -402,7 +402,7 @@ xpmFormHeader name info = T.pack $
 -- since that might give us a more faithful translation.  But we're
 -- lazy.
 
-type XpmPaletteColor = Integer
+type XpmPaletteColor = Word32
 
 -- This is our 216-color palette.  (Why 216 colors? 6 choices each of
 -- red, green blue gives us 6*6*6 = 216 colors.)
@@ -453,7 +453,7 @@ xpmPalette =
     ]
 
 -- The `distance' between two adjacent colors in the palette.
-paletteDelta :: Integer
+paletteDelta :: Word8
 paletteDelta = 0x33
 
 -----------------------------------------------------------------------------
@@ -466,29 +466,25 @@ xpmColorMap = M.fromList $ zip xpmPalette xpmPixels
 
 -- Convert a BMP pixel to a color in our palette.
 bmpPixelToPalette :: BmpPixel -> XpmPaletteColor
-bmpPixelToPalette (BmpPixel b g r) = paletteColor
+bmpPixelToPalette (BmpPixel b g r) = xpmPalette !! fromEnum idx
     where
-        idx = toInteger (paletteIndex b) * 36 +
-              toInteger (paletteIndex g) * 6 +
-              toInteger (paletteIndex r)
-        paletteColor = xpmPalette !! fromInteger idx
+        idx = paletteIndex b * 36 + paletteIndex g * 6 + paletteIndex r
 
 -- Find palette position from the given color intensity.
-paletteIndex :: Word8 -> Integer
+paletteIndex :: Word8 -> Word8
 paletteIndex c =
-    if c' `mod` paletteDelta == 0
+    if c `mod` paletteDelta == 0
         then pos
-        else paletteApprox c' pos
+        else paletteApprox c pos
     where
-        c'  = toInteger c
-        pos = c' `div` paletteDelta
+        pos = c `div` paletteDelta
 
 -- Find the closest palette color.
-paletteApprox :: Integer -> Integer -> XpmPaletteColor
+paletteApprox :: Word8 -> Word8 -> Word8
 paletteApprox c pos =
     if d1 > d2 then pos+1 else pos
-    where d1 = abs $ c - xpmPalette !! fromInteger pos
-          d2 = abs $ c - xpmPalette !! fromInteger pos+1
+    where d1 = abs $ fromEnum c - fromEnum (xpmPalette !! fromEnum pos)
+          d2 = abs $ fromEnum c - fromEnum (xpmPalette !! fromEnum (pos+1))
 
 -----------------------------------------------------------------------------
 
