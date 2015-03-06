@@ -465,8 +465,8 @@ xpmColorMap = M.fromList $ zip xpmPalette xpmPixels
 -----------------------------------------------------------------------------
 
 -- Convert a BMP pixel to a color in our palette.
-bmpPixelToPalette :: BmpPixel -> XpmPaletteColor
-bmpPixelToPalette (BmpPixel b g r) = xpmPalette !! fromEnum idx
+toPaletteColor :: BmpPixel -> XpmPaletteColor
+toPaletteColor (BmpPixel b g r) = xpmPalette !! fromEnum idx
     where
         -- BGR -> RGB, sort of.
         idx = paletteIndex r * 36 + paletteIndex g * 6 + paletteIndex b
@@ -508,9 +508,9 @@ translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
 
 -----------------------------------------------------------------------------
 
--- xxx: This function is the hot-spot.  How can I improve it?
+-- XXX: This function is the hot-spot.  How can I improve it?
 translatePixel :: BmpPixel -> XpmPixel
-translatePixel p = case M.lookup (bmpPixelToPalette p) xpmColorMap of
+translatePixel p = case M.lookup (toPaletteColor p) xpmColorMap of
                         Just c  -> F.format (left 2 ' ' %. text) c
                         Nothing -> "**"
 
