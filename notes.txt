@@ -165,3 +165,39 @@ gen[0].sync: 0
 gen[1].sync: 0
 
 -----------------------------------------------------------------------------
+
+7. After replacing M.lookup with M.!
+
+  34,720,798,816 bytes allocated in the heap
+   1,314,601,304 bytes copied during GC
+      63,028,680 bytes maximum residency (41 sample(s))
+      18,766,568 bytes maximum slop
+             144 MB total memory in use (0 MB lost due to fragmentation)
+
+                                    Tot time (elapsed)  Avg pause  Max pause
+  Gen  0     67650 colls,     0 par    1.41s    1.41s     0.0000s    0.0006s
+  Gen  1        41 colls,     0 par    0.07s    0.07s     0.0016s    0.0092s
+
+  TASKS: 4 (1 bound, 3 peak workers (3 total), using -N1)
+
+  SPARKS: 0 (0 converted, 0 overflowed, 0 dud, 0 GC'd, 0 fizzled)
+
+  INIT    time    0.00s  (  0.00s elapsed)
+  MUT     time   17.70s  ( 17.71s elapsed)
+  GC      time    1.47s  (  1.47s elapsed)
+  RP      time    0.00s  (  0.00s elapsed)
+  PROF    time    0.00s  (  0.00s elapsed)
+  EXIT    time    0.01s  (  0.01s elapsed)
+  Total   time   19.19s  ( 19.20s elapsed)
+
+  Alloc rate    1,961,963,964 bytes per MUT second
+
+  Productivity  92.3% of total user, 92.3% of total elapsed
+
+gc_alloc_block_sync: 0
+whitehole_spin: 0
+gen[0].sync: 0
+gen[1].sync: 0
+
+-----------------------------------------------------------------------------
+
