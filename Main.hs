@@ -510,7 +510,7 @@ translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
 -- XXX: This function is the hot-spot.  How can I improve it?
 translatePixel :: BmpPixel -> XpmPixel
 translatePixel p = F.format (left 2 ' ' %. text)
-                   $ xpmColorMap M.! (toPaletteColor p)
+                   $ xpmColorMap M.! toPaletteColor p
 
 -----------------------------------------------------------------------------
 
