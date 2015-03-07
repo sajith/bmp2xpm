@@ -208,9 +208,9 @@ data BmpInfoHeader = BmpInfoHeader {
 
 -- Pixel representation for uncompressed BMP files.
 data BmpPixel = BmpPixel {
-      blue  :: Word8
-    , green :: Word8
-    , red   :: Word8
+      blue  :: !Word8
+    , green :: !Word8
+    , red   :: !Word8
     } deriving (Show)
 
 type BmpRow       = [BmpPixel] -- Pixels are laid out in rows.
