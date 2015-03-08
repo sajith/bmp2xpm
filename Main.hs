@@ -26,8 +26,13 @@
  TODO:
 
   - Use parallelism.
+  - Try using memoization.
+  - Try using unboxed vectors to store input.
+  - Try alternate implementation with Repa.
   - Measure space usage; use pipes/conduit, if necessary.
   - Handle scanline padding, if present.
+  - Use histogram, rather than a static fixed palette.
+  - Add support for more complex input.
   - Use more useful debug/error messages.
   - Use exceptions instead of 'error'.
 
