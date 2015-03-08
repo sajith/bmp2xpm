@@ -469,6 +469,7 @@ toPaletteColor (BmpPixel b g r) = xpmPalette !! fromEnum idx
     where
         -- BGR -> RGB, sort of.
         idx = paletteIndex r * 36 + paletteIndex g * 6 + paletteIndex b
+{-# INLINE toPaletteColor #-}
 
 -- Find palette position from the given color intensity.
 paletteIndex :: Word8 -> Word8
@@ -478,6 +479,7 @@ paletteIndex c =
         else paletteApprox c pos
     where
         pos = c `div` paletteDelta
+{-# INLINE paletteIndex #-}
 
 -- Find the closest palette color.
 paletteApprox :: Word8 -> Word8 -> Word8
@@ -485,6 +487,7 @@ paletteApprox c pos =
     if d1 > d2 then pos+1 else pos
     where d1 = abs $ fromEnum c - fromEnum (xpmPalette !! fromEnum pos)
           d2 = abs $ fromEnum c - fromEnum (xpmPalette !! fromEnum (pos+1))
+{-# INLINE paletteApprox #-}
 
 -----------------------------------------------------------------------------
 
