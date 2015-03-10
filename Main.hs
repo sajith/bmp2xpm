@@ -343,6 +343,7 @@ type XpmData      = T.Text -- the whole file.
 
 type XpmHeader    = T.Text -- rows, columns, colors, etc.
 type XpmPixel     = T.Text -- two-character "pixels".
+type XpmPixelRow  = T.Text -- row of pixels
 type XpmColorRow  = T.Text -- "pp c #bbggrr" line.
 type XpmBitmap    = T.Text -- the actual xpm bitmap.
 
@@ -510,8 +511,12 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 -- Translate from BMP bitmap to XPM bitmap.
 translateBitmap :: BmpBitmap -> XpmBitmap
 translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
-    where
-        translateRow row = quote $ T.concat $ map translatePixel row
+
+-----------------------------------------------------------------------------
+
+-- Translate a row of pixels.
+translateRow :: BmpRow -> XpmPixelRow
+translateRow row = quote $ T.concat $ map translatePixel row
 
 -----------------------------------------------------------------------------
 
