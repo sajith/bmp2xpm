@@ -68,7 +68,6 @@ import qualified Data.Text.Lazy.IO           as T (hPutStr)
 
 import           Formatting                  as F
 
-import           Control.Applicative         ((<$>))
 import qualified Control.DeepSeq             as D
 import qualified Control.Parallel.Strategies as P
 
@@ -521,19 +520,33 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 -- Translate from BMP bitmap to XPM bitmap, but in... parallel?  The
 -- presence of parallelism is to be established though.  In fact,
 -- there doesn't seem to be any, going by the eventlog.
---
--- Could it be that I have only attempted to please the type checker
--- so far, without any actual idea of how stuff works?  It could also
--- be that there's an 'rseq' missing here.
 
 instance P.NFData BmpPixel
 
-translateBitmap :: BmpBitmap -> XpmBitmap
-translateBitmap rows = T.intercalate (T.pack ",\n") $ parTranslate rows
+{--
 
-parTranslate :: [BmpRow] -> [XpmPixelRow]
-parTranslate rows = P.runEval
-                    <$> map (P.rpar . translateRow . D.force) rows
+translateBitmap :: BmpBitmap -> XpmBitmap
+translateBitmap rows = T.intercalate (T.pack ",\n") $ map parRow rows
+
+-- This is essentially sequential!
+parRow :: BmpRow -> XpmPixelRow
+parRow row = P.runEval $ do
+             new <- P.rpar $ translateRow $ D.force row
+             _   <- P.rseq new
+             return new
+--}
+
+-- Splitting workload by two doesn't seem to do gain anything?
+translateBitmap :: BmpBitmap -> XpmBitmap
+translateBitmap rows = T.intercalate (T.pack ",\n") res
+    where
+        (p1, p2) = splitAt (length rows `div` 2) rows
+        res = P.runEval $ do
+            p1' <- P.rpar $ D.force $ map translateRow p1
+            p2' <- P.rpar $ D.force $ map translateRow p2
+            _   <- P.rseq p1'
+            _   <- P.rseq p2'
+            return (p1' ++ p2')
 
 -----------------------------------------------------------------------------
 
