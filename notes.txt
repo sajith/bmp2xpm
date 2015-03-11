@@ -446,3 +446,18 @@ gen[0].sync: 6
 gen[1].sync: 7
 
 -----------------------------------------------------------------------------
+
+
+============================================================================
+
+The "gold standard" of this sort of image conversion would be
+ImageMagic.  It breezes through the same 20MB, 2592x2592, 24-bit
+image, and produces far better output.
+
+real	0m3.465s
+user	0m2.844s
+sys	0m0.176s
+
+(I would imagine that ImageMagick uses a histogram of the input, and
+employs memoization, and little parallelism outside compiler-supported
+ILP.  I haven't checked.)
