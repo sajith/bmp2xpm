@@ -42,31 +42,35 @@
 
 module Main (main) where
 
-import           Control.Monad        (unless, when)
+import           Control.Monad               (unless, when)
 
-import           System.Directory     (doesFileExist, getPermissions, readable,
-                                       writable)
-import           System.Environment   (getArgs, getProgName)
-import           System.FilePath      (replaceExtension, takeBaseName)
+import           System.Directory            (doesFileExist, getPermissions,
+                                              readable, writable)
+import           System.Environment          (getArgs, getProgName)
+import           System.FilePath             (replaceExtension, takeBaseName)
 import           System.IO
 
-import           Data.Binary.Get      (Get, getWord16le, getWord32le, getWord8,
-                                       runGet)
-import           Data.Char            (chr, ord)
-import           Data.List            (group)
-import qualified Data.Map             as M
+import           Data.Binary.Get             (Get, getWord16le, getWord32le,
+                                              getWord8, runGet)
+import           Data.Char                   (chr, ord)
+import           Data.List                   (group)
+import qualified Data.Map                    as M
 
-import           Data.Int             (Int32)
-import           Data.Word            (Word16, Word32, Word8)
+import           Data.Int                    (Int32)
+import           Data.Word                   (Word16, Word32, Word8)
 
-import           Text.Printf          (printf)
+import           Text.Printf                 (printf)
 
-import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString.Lazy        as BL
 
-import qualified Data.Text.Lazy       as T
-import qualified Data.Text.Lazy.IO    as T (hPutStr)
+import qualified Data.Text.Lazy              as T
+import qualified Data.Text.Lazy.IO           as T (hPutStr)
 
-import           Formatting           as F
+import           Formatting                  as F
+
+import           Control.Applicative         ((<$>))
+import qualified Control.DeepSeq             as D
+import qualified Control.Parallel.Strategies as P
 
 ------------------------------------------------------------------------------------
 
@@ -509,8 +513,27 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 -----------------------------------------------------------------------------
 
 -- Translate from BMP bitmap to XPM bitmap.
+-- translateBitmap :: BmpBitmap -> XpmBitmap
+-- translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
+
+-----------------------------------------------------------------------------
+
+-- Translate from BMP bitmap to XPM bitmap, but in... parallel?  The
+-- presence of parallelism is to be established though.  In fact,
+-- there doesn't seem to be any, going by the eventlog.
+--
+-- Could it be that I have only attempted to please the type checker
+-- so far, without any actual idea of how stuff works?  It could also
+-- be that there's an 'rseq' missing here.
+
+instance P.NFData BmpPixel
+
 translateBitmap :: BmpBitmap -> XpmBitmap
-translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
+translateBitmap rows = T.intercalate (T.pack ",\n") $ parTranslate rows
+
+parTranslate :: [BmpRow] -> [XpmPixelRow]
+parTranslate rows = P.runEval
+                    <$> map (P.rpar . translateRow . D.force) rows
 
 -----------------------------------------------------------------------------
 

@@ -20,7 +20,8 @@ executable bmp2xpm
                     , containers
                     , text
                     , formatting
-                    , vector
+                    , parallel
+                    , deepseq
 
     default-language: Haskell2010
 
