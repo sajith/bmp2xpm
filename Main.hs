@@ -533,7 +533,7 @@ parRow row = P.runEval $ do
 --}
 
 -- Good news: threadscope shows parallelism, and productivity now is
--- "71.2% of total user, 223.9% of total elapsed"
+-- "82.7% of total user, 280.4% of total elapsed"
 translateBitmap :: BmpBitmap -> XpmBitmap
 translateBitmap rows = T.intercalate (T.pack ",\n") res
     where
