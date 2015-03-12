@@ -25,7 +25,6 @@
 
  TODO:
 
-  - Use parallelism.
   - Try using memoization.
   - Try using unboxed vectors to store input.
   - Try alternate implementation with Repa.
