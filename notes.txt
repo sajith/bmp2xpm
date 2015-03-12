@@ -513,6 +513,42 @@ whitehole_spin: 0
 gen[0].sync: 209
 gen[1].sync: 5261
 
+-----------------------------------------------------------------------------
+
+12. With a four-way workload split, with rpar/rseq, with -N4.  Booya,
+look at all that productivity!  Sweet sweet 280.4% productivity!  And
+now the program finishes in 4 seconds.  Woo!
+
+  20,267,787,576 bytes allocated in the heap
+     431,673,576 bytes copied during GC
+      60,565,840 bytes maximum residency (17 sample(s))
+      16,127,632 bytes maximum slop
+             146 MB total memory in use (12 MB lost due to fragmentation)
+
+                                    Tot time (elapsed)  Avg pause  Max pause
+  Gen  0     15105 colls, 15105 par    2.20s    0.61s     0.0000s    0.0081s
+  Gen  1        17 colls,    16 par    0.11s    0.04s     0.0022s    0.0105s
+
+  Parallel GC work balance: 80.25% (serial 0%, perfect 100%)
+
+  TASKS: 10 (1 bound, 9 peak workers (9 total), using -N4)
+
+  SPARKS: 3 (3 converted, 0 overflowed, 0 dud, 0 GC'd, 0 fizzled)
+
+  INIT    time    0.00s  (  0.00s elapsed)
+  MUT     time   11.06s  (  3.29s elapsed)
+  GC      time    2.31s  (  0.65s elapsed)
+  EXIT    time    0.01s  (  0.01s elapsed)
+  Total   time   13.39s  (  3.95s elapsed)
+
+  Alloc rate    1,832,309,560 bytes per MUT second
+
+  Productivity  82.7% of total user, 280.4% of total elapsed
+
+gc_alloc_block_sync: 84603
+whitehole_spin: 0
+gen[0].sync: 3318
+gen[1].sync: 26874
 
 ============================================================================
 

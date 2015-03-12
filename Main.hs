@@ -517,10 +517,6 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 
 -----------------------------------------------------------------------------
 
--- Translate from BMP bitmap to XPM bitmap, but in... parallel?  The
--- presence of parallelism is to be established though.  In fact,
--- there doesn't seem to be any, going by the eventlog.
-
 instance P.NFData BmpPixel
 
 {--
@@ -536,17 +532,21 @@ parRow row = P.runEval $ do
              return new
 --}
 
--- Splitting workload by two doesn't seem to do gain anything?
+-- Good news: threadscope shows parallelism, and productivity now is
+-- "71.2% of total user, 223.9% of total elapsed"
 translateBitmap :: BmpBitmap -> XpmBitmap
 translateBitmap rows = T.intercalate (T.pack ",\n") res
     where
-        (p1, p2) = splitAt (length rows `div` 2) rows
+        -- Splitting workload by four.
+        (p1, p2)   = splitAt (length rows `div` 2) rows
+        (p11, p12) = splitAt (length p1 `div` 2) p1
+        (p21, p22) = splitAt (length p2 `div` 2) p2
         res = P.runEval $ do
-            p1' <- P.rpar $ D.force $ map translateRow p1
-            p2' <- P.rpar $ D.force $ map translateRow p2
-            _   <- P.rseq p1'
-            _   <- P.rseq p2'
-            return (p1' ++ p2')
+            p11' <- P.rpar $ D.force $ map translateRow p11
+            p12' <- P.rpar $ D.force $ map translateRow p12
+            p21' <- P.rpar $ D.force $ map translateRow p21
+            p22' <- P.rseq $ D.force $ map translateRow p22
+            return (p11' ++ p12' ++ p21' ++ p22')
 
 -----------------------------------------------------------------------------
 
