@@ -565,7 +565,6 @@ translatePixel p = F.format (left 2 ' ' %. text)
 
 -- Put double quotes around text.
 quote :: T.Text -> T.Text
-quote txt = T.snoc (T.cons dq txt) dq
-           where dq = '\"'
+quote txt = T.snoc (T.cons dq txt) dq where dq = '"'
 
 -----------------------------------------------------------------------------
