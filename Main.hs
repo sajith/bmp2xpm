@@ -527,7 +527,7 @@ translateBitmap rows = T.intercalate (T.pack ",\n") $ map parRow rows
 -- This is essentially sequential!
 parRow :: BmpRow -> XpmPixelRow
 parRow row = P.runEval $ do
-             new <- P.rpar $ translateRow $ D.force row
+             new <- P.rpar $ D.force $ translateRow row
              _   <- P.rseq new
              return new
 --}
