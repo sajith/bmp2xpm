@@ -531,6 +531,13 @@ translateBitmap rows = T.intercalate (T.pack ",\n") res
 
 -----------------------------------------------------------------------------
 
+-- The commented out stuff below is of historic interest: the first
+-- one is the original sequential version of translateBitmap.
+--
+-- The second one answered the question "what if I use rpar/rseq this
+-- way?"  And the answer was: that would actually be sequential, you
+-- silly person!
+
 {--
 
 -- Translate from BMP bitmap to XPM bitmap, the sequential version.
@@ -539,8 +546,6 @@ translateBitmap rows = T.intercalate (T.pack ",\n")
                        $ map translatePixelRow rows
 
 --}
-
------------------------------------------------------------------------------
 
 {--
 
