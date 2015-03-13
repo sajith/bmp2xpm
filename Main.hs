@@ -221,8 +221,8 @@ data BmpPixel = BmpPixel {
     , red   :: !Word8
     } deriving (Show)
 
-type BmpRow       = [BmpPixel] -- Pixels are laid out in rows.
-type BmpBitmap    = [BmpRow]   -- Bitmap data is a row of rows.
+type BmpPixelRow  = [BmpPixel]    -- Pixels are laid out in rows.
+type BmpBitmap    = [BmpPixelRow] -- Bitmap data is a row of rows.
 
 -- And voila!  We have a BMP file.
 data BmpFile      = BmpFile BmpFileHeader BmpInfoHeader BmpBitmap
@@ -267,13 +267,13 @@ getBmpBitmap hdr bs = pixels
         range  = if imageHeight hdr > 0
                  then reverse [0..(height-1)]
                  else [0..(height-1)]
-        pixels = map (\h -> getBmpRow h width bs) range
+        pixels = map (\h -> getBmpPixelRow h width bs) range
 
 -----------------------------------------------------------------------------
 
 -- Read a scanline of BMP pixels.
-getBmpRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpRow
-getBmpRow rownum width bs = row
+getBmpPixelRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpPixelRow
+getBmpPixelRow rownum width bs = row
     where
         bs'         = BL.drop (fromIntegral (rownum*width*3)) bs
         offsets     = [0,3..(width-1)*3]
@@ -523,10 +523,10 @@ translateBitmap rows = T.intercalate (T.pack ",\n") res
         (p11, p12) = splitAt (length p1 `div` 2) p1
         (p21, p22) = splitAt (length p2 `div` 2) p2
         res = P.runEval $ do
-            p11' <- P.rpar $ D.force $ map translateRow p11
-            p12' <- P.rpar $ D.force $ map translateRow p12
-            p21' <- P.rpar $ D.force $ map translateRow p21
-            p22' <- P.rseq $ D.force $ map translateRow p22
+            p11' <- P.rpar $ D.force $ map translatePixelRow p11
+            p12' <- P.rpar $ D.force $ map translatePixelRow p12
+            p21' <- P.rpar $ D.force $ map translatePixelRow p21
+            p22' <- P.rseq $ D.force $ map translatePixelRow p22
             return (p11' ++ p12' ++ p21' ++ p22')
 
 -----------------------------------------------------------------------------
@@ -535,7 +535,8 @@ translateBitmap rows = T.intercalate (T.pack ",\n") res
 
 -- Translate from BMP bitmap to XPM bitmap, the sequential version.
 translateBitmap :: BmpBitmap -> XpmBitmap
-translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
+translateBitmap rows = T.intercalate (T.pack ",\n")
+                       $ map translatePixelRow rows
 
 --}
 
@@ -545,21 +546,22 @@ translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
 
 -- First attempt with rpar/rseq.
 translateBitmap :: BmpBitmap -> XpmBitmap
-translateBitmap rows = T.intercalate (T.pack ",\n") $ map parRow rows
+translateBitmap rows = T.intercalate (T.pack ",\n") $ map parPixelRow rows
 
 -- This is essentially sequential!
-parRow :: BmpRow -> XpmPixelRow
-parRow row = P.runEval $ do
-             new <- P.rpar $ D.force $ translateRow row
-             _   <- P.rseq new
-             return new
+parPixelRow :: BmpPixelRow -> XpmPixelRow
+parPixelRow row = P.runEval $ do
+    new <- P.rpar $ D.force $ translatePixelRow row
+    _   <- P.rseq new
+    return new
+
 --}
 
 -----------------------------------------------------------------------------
 
 -- Translate a row of pixels.
-translateRow :: BmpRow -> XpmPixelRow
-translateRow row = quote $ T.concat $ map translatePixel row
+translatePixelRow :: BmpPixelRow -> XpmPixelRow
+translatePixelRow row = quote $ T.concat $ map translatePixel row
 
 -----------------------------------------------------------------------------
 
