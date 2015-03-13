@@ -13,7 +13,12 @@ Use a sandbox if you need to.
 
 For a profiling build, do this:
 
-    ghc -O2 -rtsopts -threaded -prof Main.hs -o Main.exe
+    ghc -O2 -rtsopts -threaded -prof -auto-all Main.hs -o Main.exe
 
-We'll need profiling libraries.  Install ghc-prof!
+We'll need profiling libraries.  Install 'ghc-prof'!
 
+To review eventlog under ThreadScope, do this:
+
+    ghc -O2 -rtsopts -threaded -eventlog Main.hs -o Main.exe
+
+Note that '-eventlog' and '-prof' are mutually incompatible.
