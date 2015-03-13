@@ -18,7 +18,7 @@ For a profiling build, do this:
 We'll need profiling libraries.  Install 'ghc-prof'!
 
 To review eventlog under ThreadScope, compile the program like below,
-run the program, and open the resulting Main.exe.eventlog file in
+run the program, and then open the resulting Main.exe.eventlog file in
 ThreadScope:
 
     ghc -O2 -rtsopts -threaded -eventlog Main.hs -o Main.exe
