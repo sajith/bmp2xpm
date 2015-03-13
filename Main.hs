@@ -511,26 +511,7 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 
 -----------------------------------------------------------------------------
 
--- Translate from BMP bitmap to XPM bitmap.
--- translateBitmap :: BmpBitmap -> XpmBitmap
--- translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
-
------------------------------------------------------------------------------
-
 instance P.NFData BmpPixel
-
-{--
-
-translateBitmap :: BmpBitmap -> XpmBitmap
-translateBitmap rows = T.intercalate (T.pack ",\n") $ map parRow rows
-
--- This is essentially sequential!
-parRow :: BmpRow -> XpmPixelRow
-parRow row = P.runEval $ do
-             new <- P.rpar $ D.force $ translateRow row
-             _   <- P.rseq new
-             return new
---}
 
 -- Good news: threadscope shows parallelism, and productivity now is
 -- "82.7% of total user, 280.4% of total elapsed"
@@ -547,6 +528,32 @@ translateBitmap rows = T.intercalate (T.pack ",\n") res
             p21' <- P.rpar $ D.force $ map translateRow p21
             p22' <- P.rseq $ D.force $ map translateRow p22
             return (p11' ++ p12' ++ p21' ++ p22')
+
+-----------------------------------------------------------------------------
+
+{--
+
+-- Translate from BMP bitmap to XPM bitmap, the sequential version.
+translateBitmap :: BmpBitmap -> XpmBitmap
+translateBitmap rows = T.intercalate (T.pack ",\n") $ map translateRow rows
+
+--}
+
+-----------------------------------------------------------------------------
+
+{--
+
+-- First attempt with rpar/rseq.
+translateBitmap :: BmpBitmap -> XpmBitmap
+translateBitmap rows = T.intercalate (T.pack ",\n") $ map parRow rows
+
+-- This is essentially sequential!
+parRow :: BmpRow -> XpmPixelRow
+parRow row = P.runEval $ do
+             new <- P.rpar $ D.force $ translateRow row
+             _   <- P.rseq new
+             return new
+--}
 
 -----------------------------------------------------------------------------
 
