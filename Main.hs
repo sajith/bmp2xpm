@@ -30,10 +30,10 @@
   - Try alternate implementation with Repa.
   - Measure space usage; use pipes/conduit, if necessary.
   - Handle scanline padding, if present.
-  - Use histogram, rather than a static fixed palette.
   - Add support for more complex (all color depths, more than one
     plane, newer versions) input.
-  - Use more useful debug/error messages.
+  - To generate output, use a histogram, rather than a static fixed
+    palette.
   - Use exceptions instead of 'error'.
 
 --}
