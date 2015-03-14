@@ -550,6 +550,85 @@ whitehole_spin: 0
 gen[0].sync: 3318
 gen[1].sync: 26874
 
+-----------------------------------------------------------------------------
+
+13a. Bitmap scanlines as unboxed vectors, with -N1
+
+  23,645,141,384 bytes allocated in the heap
+      51,648,736 bytes copied during GC
+      54,963,048 bytes maximum residency (10 sample(s))
+      26,944,488 bytes maximum slop
+             135 MB total memory in use (3 MB lost due to fragmentation)
+
+                                    Tot time (elapsed)  Avg pause  Max pause
+  Gen  0     45873 colls,     0 par    0.26s    0.26s     0.0000s    0.0005s
+  Gen  1        10 colls,     0 par    0.02s    0.02s     0.0019s    0.0082s
+
+  TASKS: 4 (1 bound, 3 peak workers (3 total), using -N1)
+
+  SPARKS: 3 (0 converted, 0 overflowed, 0 dud, 0 GC'd, 3 fizzled)
+
+  INIT    time    0.00s  (  0.00s elapsed)
+  MUT     time    7.01s  (  7.02s elapsed)
+  GC      time    0.28s  (  0.28s elapsed)
+  EXIT    time    0.01s  (  0.01s elapsed)
+  Total   time    7.31s  (  7.31s elapsed)
+
+  Alloc rate    3,371,453,941 bytes per MUT second
+
+  Productivity  96.2% of total user, 96.1% of total elapsed
+
+gc_alloc_block_sync: 0
+whitehole_spin: 0
+gen[0].sync: 0
+gen[1].sync: 0
+
+real	0m7.315s
+user	0m7.136s
+sys	0m0.168s
+
+-----------------------------------------------------------------------------
+
+13b. Bitmap scanlines as unboxed vectors, with -N4
+(See branch bitmap-as-unboxed-vector.)
+
+  23,645,409,792 bytes allocated in the heap
+      85,297,608 bytes copied during GC
+      61,755,768 bytes maximum residency (11 sample(s))
+      25,185,760 bytes maximum slop
+             139 MB total memory in use (24 MB lost due to fragmentation)
+
+                                    Tot time (elapsed)  Avg pause  Max pause
+  Gen  0     18590 colls, 18590 par    3.27s    1.06s     0.0001s    0.0236s
+  Gen  1        11 colls,    10 par    0.04s    0.02s     0.0017s    0.0097s
+
+  Parallel GC work balance: 16.99% (serial 0%, perfect 100%)
+
+  TASKS: 10 (1 bound, 9 peak workers (9 total), using -N4)
+
+  SPARKS: 3 (3 converted, 0 overflowed, 0 dud, 0 GC'd, 0 fizzled)
+
+  INIT    time    0.00s  (  0.00s elapsed)
+  MUT     time   14.24s  (  4.46s elapsed)
+  GC      time    3.31s  (  1.08s elapsed)
+  EXIT    time    0.01s  (  0.01s elapsed)
+  Total   time   17.57s  (  5.55s elapsed)
+
+  Alloc rate    1,660,904,307 bytes per MUT second
+
+  Productivity  81.1% of total user, 256.7% of total elapsed
+
+gc_alloc_block_sync: 33312
+whitehole_spin: 0
+gen[0].sync: 3508
+gen[1].sync: 17291
+
+real	0m5.558s
+user	0m15.720s
+sys	0m1.848s
+
+
+
 ============================================================================
 
 The "gold standard" of this sort of image conversion would be
