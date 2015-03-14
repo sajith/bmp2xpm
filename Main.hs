@@ -413,7 +413,7 @@ xpmFormHeader name info = T.pack $
 type XpmPaletteColor = Word32
 
 -- This is our 216-color palette.  (Why 216 colors? 6 choices each of
--- red, green blue gives us 6*6*6 = 216 colors.)
+-- red, green, and blue gives us 6*6*6 = 216 colors.)
 xpmPalette :: [XpmPaletteColor]
 xpmPalette =
     [
