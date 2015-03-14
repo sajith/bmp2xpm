@@ -1,4 +1,7 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
 
 ------------------------------------------------------------------------------------
 -- |
@@ -42,7 +45,7 @@
 
 module Main (main) where
 
-import           Control.Monad               (unless, when)
+import           Control.Monad               (liftM, unless, when, zipWithM_)
 
 import           System.Directory            (doesFileExist, getPermissions,
                                               readable, writable)
@@ -58,6 +61,10 @@ import qualified Data.Map                    as M
 
 import           Data.Int                    (Int32)
 import           Data.Word                   (Word16, Word32, Word8)
+
+import qualified Data.Vector.Generic         as G
+import qualified Data.Vector.Generic.Mutable as GM
+import           Data.Vector.Unboxed.Base    as U
 
 import           Text.Printf                 (printf)
 
@@ -221,7 +228,7 @@ data BmpPixel = BmpPixel {
     , red   :: !Word8
     } deriving (Show)
 
-type BmpPixelRow  = [BmpPixel]    -- Pixels are laid out in rows.
+type BmpPixelRow  = U.Vector BmpPixel    -- Pixels are laid out in rows.
 type BmpBitmap    = [BmpPixelRow] -- Bitmap data is a row of rows.
 
 -- And voila!  We have a BMP file.
@@ -273,7 +280,7 @@ getBmpBitmap hdr bs = pixels
 
 -- Read a scanline of BMP pixels.
 getBmpPixelRow :: BitmapRowNum -> BitmapWidth -> BL.ByteString -> BmpPixelRow
-getBmpPixelRow rownum width bs = row
+getBmpPixelRow rownum width bs = G.fromList row
     where
         bs'         = BL.drop (fromIntegral (rownum*width*3)) bs
         offsets     = [0,3..(width-1)*3]
@@ -566,7 +573,8 @@ parPixelRow row = P.runEval $ do
 
 -- Translate a row of pixels.
 translatePixelRow :: BmpPixelRow -> XpmPixelRow
-translatePixelRow row = quote $ T.concat $ map translatePixel row
+translatePixelRow row = quote $ T.concat $ G.toList $
+                        G.map translatePixel row
 
 -----------------------------------------------------------------------------
 
@@ -582,3 +590,49 @@ quote :: T.Text -> T.Text
 quote txt = T.snoc (T.cons dq txt) dq where dq = '"'
 
 -----------------------------------------------------------------------------
+
+instance Unbox XpmPixel
+instance GM.MVector MVector XpmPixel
+instance G.Vector Vector XpmPixel
+
+-----------------------------------------------------------------------------
+
+newtype instance MVector s BmpPixel = MV_BmpPixel (MVector s Word8)
+newtype instance Vector    BmpPixel = V_BmpPixel (Vector Word8)
+instance U.Unbox BmpPixel
+
+instance GM.MVector U.MVector BmpPixel where
+    basicLength (MV_BmpPixel p)
+        = GM.basicLength p `div` 3
+    basicUnsafeSlice a b (MV_BmpPixel p)
+        = MV_BmpPixel $ GM.basicUnsafeSlice (a*3) (b*3) p
+    basicOverlaps (MV_BmpPixel p0) (MV_BmpPixel p1)
+        = GM.basicOverlaps p0 p1
+    basicUnsafeNew n
+        = liftM MV_BmpPixel (GM.basicUnsafeNew (3*n))
+    {-# INLINE basicUnsafeRead #-}
+    basicUnsafeRead (MV_BmpPixel p) n
+        = do
+            [b, g, r] <- mapM (GM.basicUnsafeRead p) [3*n, 3*n+1, 3*n+2]
+            return $ BmpPixel { blue = b, green = g, red = r }
+    {-# INLINE basicUnsafeWrite #-}
+    basicUnsafeWrite (MV_BmpPixel p) n (BmpPixel r g b)
+        = zipWithM_ (GM.basicUnsafeWrite p) [3*n, 3*n+1, 3*n+2] [r, g, b]
+
+instance G.Vector U.Vector BmpPixel where
+    basicUnsafeFreeze (MV_BmpPixel p)
+        = liftM V_BmpPixel (G.basicUnsafeFreeze p)
+    basicUnsafeThaw (V_BmpPixel p)
+        = liftM MV_BmpPixel (G.basicUnsafeThaw p)
+    basicLength (V_BmpPixel p)
+        = G.basicLength p `div` 3
+    basicUnsafeSlice a b (V_BmpPixel p)
+        = V_BmpPixel $ G.basicUnsafeSlice (a*3) (b*3) p
+    {-# INLINE basicUnsafeIndexM #-}
+    basicUnsafeIndexM (V_BmpPixel p) n
+        = do
+            [b,g,r] <- mapM (G.basicUnsafeIndexM p) [3*n, 3*n+1, 3*n+2]
+            return $ BmpPixel { blue = b, green = g, red = r }
+
+-----------------------------------------------------------------------------
+
