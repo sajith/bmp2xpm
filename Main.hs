@@ -153,7 +153,6 @@ readBmpFile handle = do
 
     contents <- BL.hGetContents handle
 
-    -- TODO: do away with too many 'from...' calls
     let bmpHdr  = runGet readBmpFileHeader contents
         infoOff = fromInteger bmpFileHeaderSize
         bmpInfo = runGet readBmpInfoHeader $ BL.drop infoOff contents
