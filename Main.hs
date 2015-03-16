@@ -59,14 +59,17 @@ import qualified Data.Map                    as M
 import           Data.Int                    (Int32)
 import           Data.Word                   (Word16, Word32, Word8)
 
+-- In theory we need only one of 'Formatting' and 'Text.Printf', but
+-- in practice I don't know how to correctly format XPM palette using
+-- 'Formatting'.  But 'Formatting' performs so much better, so using
+-- it where possible is a good idea.
+import           Formatting                  as F
 import           Text.Printf                 (printf)
 
 import qualified Data.ByteString.Lazy        as BL
 
 import qualified Data.Text.Lazy              as T
 import qualified Data.Text.Lazy.IO           as T (hPutStr)
-
-import           Formatting                  as F
 
 import qualified Control.DeepSeq             as D
 import qualified Control.Parallel.Strategies as P
