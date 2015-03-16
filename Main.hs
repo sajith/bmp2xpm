@@ -26,7 +26,6 @@
  TODO:
 
   - Try using memoization.
-  - Try using unboxed vectors to store input.
   - Try alternate implementation with Repa.
   - Measure space usage; use pipes/conduit, if necessary.
   - Handle scanline padding, if present.
