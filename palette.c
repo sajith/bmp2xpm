@@ -30,7 +30,7 @@ int main (int argc, char **argv)
         for (unsigned red = 0; red < 6; red++) {
                 for (unsigned green = 0; green < 6; green++) {
                         for (unsigned blue = 0; blue < 6; blue++) {
-                                /* rgbquad  */
+
                                 rgbquad_t q;
                                 q.blue     = deltas[blue];
                                 q.green    = deltas[green];
