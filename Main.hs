@@ -521,21 +521,29 @@ xpmColorLines = map (uncurry colorLine) $ M.toList xpmColorMap
 
 instance P.NFData BmpPixel
 
+-- 'splitBy' (originally 'split') and 'chunk' are from Simon Marlow's
+-- "Parallel and Concurrent Programming in Haskell", 1st ed, pp 40.
+splitBy :: Int -> [a] -> [[a]]
+splitBy n xs = chunk (length xs `quot` n) xs
+
+chunk :: Int -> [a] -> [[a]]
+chunk _ [] = []
+chunk n xs = as : chunk n bs
+    where
+        (as, bs) = splitAt n xs
+
 -- Good news: threadscope shows parallelism, and productivity now is
 -- "82.7% of total user, 280.4% of total elapsed"
 translateBitmap :: BmpBitmap -> XpmBitmap
 translateBitmap rows = T.intercalate (T.pack ",\n") res
     where
-        -- Splitting workload by four.
-        (p1, p2)   = splitAt (length rows `div` 2) rows
-        (p11, p12) = splitAt (length p1 `div` 2) p1
-        (p21, p22) = splitAt (length p2 `div` 2) p2
+        [a, b, c, d] = splitBy 4 rows
         res = P.runEval $ do
-            p11' <- P.rpar $ D.force $ map translatePixelRow p11
-            p12' <- P.rpar $ D.force $ map translatePixelRow p12
-            p21' <- P.rpar $ D.force $ map translatePixelRow p21
-            p22' <- P.rseq $ D.force $ map translatePixelRow p22
-            return (p11' ++ p12' ++ p21' ++ p22')
+            a' <- P.rpar $ D.force $ map translatePixelRow a
+            b' <- P.rpar $ D.force $ map translatePixelRow b
+            c' <- P.rpar $ D.force $ map translatePixelRow c
+            d' <- P.rseq $ D.force $ map translatePixelRow d
+            return (a' ++ b' ++ c' ++ d')
 
 -----------------------------------------------------------------------------
 
