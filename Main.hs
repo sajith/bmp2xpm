@@ -30,6 +30,7 @@
 
   - Try using memoization.
   - Try alternate implementation with Repa.
+  - Try DPH/Stream fusion.
   - Measure space usage; use pipes/conduit, if necessary.
   - Handle scanline padding, if present.
   - Add support for more complex (all color depths, more than one
