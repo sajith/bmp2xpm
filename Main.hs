@@ -74,6 +74,9 @@ import qualified Data.Text.Lazy.IO           as T (hPutStr)
 import qualified Control.DeepSeq             as D
 import qualified Control.Parallel.Strategies as P
 
+import           Control.Concurrent.MVar     (newMVar, readMVar, swapMVar)
+import           System.IO.Unsafe            (unsafePerformIO)
+
 ------------------------------------------------------------------------------------
 
 main :: IO ()
@@ -221,7 +224,11 @@ data BmpPixel = BmpPixel {
       blue  :: !Word8
     , green :: !Word8
     , red   :: !Word8
-    } deriving (Show)
+    } deriving (Show, Ord)
+
+instance Eq BmpPixel where
+    a == b = blue a == blue b && green a == green b && red a == red b
+    a /= b = not $ a == b
 
 type BmpPixelRow  = [BmpPixel]    -- Pixels are laid out in rows.
 type BmpBitmap    = [BmpPixelRow] -- Bitmap data is a row of rows.
@@ -576,7 +583,7 @@ parPixelRow row = P.runEval $ do
 
 -- Translate a row of pixels.
 translatePixelRow :: BmpPixelRow -> XpmPixelRow
-translatePixelRow row = quote $ T.concat $ map translatePixel row
+translatePixelRow row = quote $ T.concat $ map translatePixel' row
 
 -----------------------------------------------------------------------------
 
@@ -590,5 +597,36 @@ translatePixel p = F.format (left 2 ' ' %. text)
 -- Put double quotes around text.
 quote :: T.Text -> T.Text
 quote txt = T.snoc (T.cons dq txt) dq where dq = '"'
+
+-----------------------------------------------------------------------------
+
+-- From
+-- http://t0yv0.blogspot.com/2009/01/haskell-memoization-with.html
+--
+-- Not a nice enough way to memoize stuff: the program now runs
+-- slower, and spends 49.4% time in memoize.  But: translatePixel
+-- calls are a fully 96.926% *fewer* when memoized, so this is
+-- definitely a strategy worth investigating, without all the MVar
+-- stuff.
+--
+
+memoize :: Ord a => (a -> b) -> a -> b
+memoize f =
+    unsafePerformIO $ do
+        cacheRef <- newMVar M.empty
+        return (unsafePerformIO . g cacheRef)
+    where
+        g cacheRef x = do
+            cache <- readMVar cacheRef
+            case M.lookup x cache of
+                Just y  -> return y
+                Nothing -> do
+                    let y      = f x
+                    let cache' = M.insert x y cache
+                    _ <- swapMVar cacheRef cache'
+                    return y
+
+translatePixel' :: BmpPixel -> XpmPixel
+translatePixel' = memoize translatePixel
 
 -----------------------------------------------------------------------------
