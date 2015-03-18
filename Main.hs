@@ -74,8 +74,8 @@ import qualified Data.Text.Lazy.IO           as T (hPutStr)
 import qualified Control.DeepSeq             as D
 import qualified Control.Parallel.Strategies as P
 
-import           Control.Concurrent.MVar     (newMVar, readMVar, swapMVar)
-import           System.IO.Unsafe            (unsafePerformIO)
+import           Control.Monad.ST
+import           Data.STRef                  (newSTRef, readSTRef, writeSTRef)
 
 ------------------------------------------------------------------------------------
 
@@ -583,7 +583,7 @@ parPixelRow row = P.runEval $ do
 
 -- Translate a row of pixels.
 translatePixelRow :: BmpPixelRow -> XpmPixelRow
-translatePixelRow row = quote $ T.concat $ map translatePixel' row
+translatePixelRow row = quote $ T.concat $ map translatePixel row
 
 -----------------------------------------------------------------------------
 
@@ -600,33 +600,19 @@ quote txt = T.snoc (T.cons dq txt) dq where dq = '"'
 
 -----------------------------------------------------------------------------
 
--- From
--- http://t0yv0.blogspot.com/2009/01/haskell-memoization-with.html
---
--- Not a nice enough way to memoize stuff: the program now runs
--- slower, and spends 49.4% time in memoize.  But: translatePixel
--- calls are a fully 96.926% *fewer* when memoized, so this is
--- definitely a strategy worth investigating, without all the MVar
--- stuff.
---
+-- TODO: this is incomplete
 
-memoize :: Ord a => (a -> b) -> a -> b
-memoize f =
-    unsafePerformIO $ do
-        cacheRef <- newMVar M.empty
-        return (unsafePerformIO . g cacheRef)
-    where
-        g cacheRef x = do
-            cache <- readMVar cacheRef
-            case M.lookup x cache of
-                Just y  -> return y
-                Nothing -> do
-                    let y      = f x
-                    let cache' = M.insert x y cache
-                    _ <- swapMVar cacheRef cache'
-                    return y
+memoize :: Ord k => (k -> ST s a) -> ST s (k -> ST s a)
+memoize f = do
+    mc <- newSTRef M.empty
+    return $ \k -> do
+        c <- readSTRef mc
+        case M.lookup k c of
+            Just a  -> return a
+            Nothing -> do a <- f k
+                          writeSTRef mc (M.insert k a c) >> return a
 
-translatePixel' :: BmpPixel -> XpmPixel
-translatePixel' = memoize translatePixel
+-- translatePixel' :: BmpPixel -> XpmPixel
+-- translatePixel' = runST $ memoize $ liftM translatePixel
 
 -----------------------------------------------------------------------------
