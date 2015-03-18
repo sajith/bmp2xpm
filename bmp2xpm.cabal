@@ -22,6 +22,8 @@ executable bmp2xpm
                     , formatting
                     , parallel
                     , deepseq
+                    , runmemo
+                    , data-memocombinators
 
     default-language: Haskell2010
 

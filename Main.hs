@@ -74,6 +74,9 @@ import qualified Data.Text.Lazy.IO           as T (hPutStr)
 import qualified Control.DeepSeq             as D
 import qualified Control.Parallel.Strategies as P
 
+import qualified Data.MemoCombinators        as Memo
+import           Data.RunMemo
+
 ------------------------------------------------------------------------------------
 
 main :: IO ()
@@ -221,7 +224,13 @@ data BmpPixel = BmpPixel {
       blue  :: !Word8
     , green :: !Word8
     , red   :: !Word8
-    } deriving (Show)
+    } deriving (Show, Ord)
+
+instance Eq BmpPixel where
+    a == b = blue a == blue b && green a == green b && red a == red b
+    a /= b = not $ a == b
+
+-- instance Integral BmpPixel
 
 type BmpPixelRow  = [BmpPixel]    -- Pixels are laid out in rows.
 type BmpBitmap    = [BmpPixelRow] -- Bitmap data is a row of rows.
@@ -584,6 +593,17 @@ translatePixelRow row = quote $ T.concat $ map translatePixel row
 translatePixel :: BmpPixel -> XpmPixel
 translatePixel p = F.format (left 2 ' ' %. text)
                    $ xpmColorMap M.! toPaletteColor p
+
+-- TODO: incomplete.
+
+translatePixelMemo :: Memoizable (BmpPixel -> XpmPixel)
+translatePixelMemo = undefined
+
+pixmemo :: Memoizer BmpPixel XpmPixel
+pixmemo = undefined
+
+translatePixel' :: BmpPixel -> XpmPixel
+translatePixel' = runMemo pixmemo translatePixelMemo
 
 -----------------------------------------------------------------------------
 
