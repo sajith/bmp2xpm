@@ -42,4 +42,3 @@ executable bmp2xpm
 
     ghc-options: -threaded -O2 -Wall -fno-warn-orphans -fno-warn-missing-methods
 
-
