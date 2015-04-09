@@ -371,7 +371,7 @@ bmpToXpm name (BmpFile _ info bitmap) = xpmData
 
 -----------------------------------------------------------------------------
 
--- XPM pixels are chosen from this range.
+-- XPM pixels are chosen from this range of ASCII values.
 xpmChrRange :: String
 xpmChrRange = map chr [48..124]
 
