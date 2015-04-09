@@ -30,10 +30,9 @@
   - Try DPH/Stream fusion.
   - Measure space usage; use pipes/conduit, if necessary.
   - Handle scanline padding, if present.
-  - Add support for more complex (all color depths, more than one
-    plane, newer versions) input.
-  - To generate output, use a histogram, rather than a static fixed
-    palette.
+  - Add support for more complex (8/16/32-bit colors, more than one
+    plane, newer/older BMP versions) input.
+  - Use a histogram-based palette, rather than a static fixed palette.
   - Use exceptions instead of 'error'.
 
 --}
