@@ -34,6 +34,8 @@
     plane, newer/older BMP versions) input.
   - Use a histogram-based palette, rather than a static fixed palette.
   - Use exceptions instead of 'error'.
+  - Use Strategies.
+  - Use Critereon for benchmarking.
 
 --}
 
