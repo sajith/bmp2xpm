@@ -25,7 +25,10 @@
 
  TODO:
 
-  - Try using memoization.
+  - Try using memoization.  (The few libraries I tried actually slowed
+    down things, likely because of fine granularity.  But this is a case
+    flush with memoization opportunities!  I believe some hand-tuned
+    memoization will help.)
   - Try alternate implementation with Repa.
   - Try DPH/Stream fusion.
   - Measure space usage; use pipes/conduit, if necessary.
