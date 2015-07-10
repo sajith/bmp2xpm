@@ -2,7 +2,7 @@ name:                bmp2xpm
 version:             0.0.1
 synopsis:            An embarrassingly simple image conversion program.
 homepage:            https://gitorious.org/junkdrawer/bmp2xpm/
-license:             BSD3
+license:             MIT
 license-file:        LICENSE
 author:              Sajith Sasidharan
 maintainer:          sajith@nonzen.in

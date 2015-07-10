@@ -2,7 +2,7 @@
 -- |
 -- Module      :  Bmp
 -- Copyright   :  (C) 2015 Sajith Sasidharan
--- License     :  BSD3 (see LICENSE)
+-- License     :  MIT (see LICENSE)
 --
 -- Maintainer  :  sajith@nonzen.in
 -- Stability   :  experimental
