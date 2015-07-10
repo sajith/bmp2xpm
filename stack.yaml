@@ -1,0 +1,8 @@
+flags:
+  bmp2xpm:
+    eventlog: false
+    prof: false
+packages:
+- '.'
+extra-deps: []
+resolver: lts-2.16
