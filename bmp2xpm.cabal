@@ -5,7 +5,7 @@ license:       MIT
 license-file:  LICENSE
 maintainer:    sajith@nonzen.in
 author:        Sajith Sasidharan
-homepage:      https://gitorious.org/junkdrawer/bmp2xpm/
+homepage:      https://git.sr.ht/~sajith/bmp2xpm
 synopsis:      An embarrassingly simple image conversion program.
 build-type:    Simple
 
