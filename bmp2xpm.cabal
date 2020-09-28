@@ -21,6 +21,10 @@ executable bmp2xpm
     main-is:          Main.hs
     hs-source-dirs:   src
 
+    other-modules: Bmp
+                 , Conversion
+                 , Xpm
+
     build-depends:    base
                     , binary
                     , directory
