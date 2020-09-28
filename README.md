@@ -6,9 +6,8 @@ better idea of parallel programming in Haskell.
 
 To build and run this program, do this:
 
-    cabal configure
     cabal build
-    ./dist/build/bmp2xpm/bmp2xpm input.bmp output.xpm
+    cabal exec bmp2xpm input.bmp output.xpm
 
 Use a sandbox if you need to.
 
