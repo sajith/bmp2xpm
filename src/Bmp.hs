@@ -25,6 +25,8 @@ import           Data.Word                   (Word16, Word32, Word8)
 
 import           Data.Char                   (ord)
 
+import           GHC.Generics                (Generic)
+
 import           System.IO
 
 import qualified Control.Parallel.Strategies as P
@@ -62,7 +64,7 @@ data BmpPixel = BmpPixel {
       blue  :: !Word8
     , green :: !Word8
     , red   :: !Word8
-    } deriving (Show)
+    } deriving (Generic, Show)
 
 type BmpPixelRow  = [BmpPixel]    -- Pixels are laid out in rows.
 type BmpBitmap    = [BmpPixelRow] -- Bitmap data is a row of rows.
