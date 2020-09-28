@@ -26,8 +26,6 @@ import           GHC.Generics                (Generic)
 
 import           Data.Char                   (ord)
 
-import           GHC.Generics                (Generic)
-
 import           System.IO
 
 import qualified Control.Parallel.Strategies as P
