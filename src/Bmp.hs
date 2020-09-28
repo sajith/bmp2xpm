@@ -22,6 +22,7 @@ import           Data.Binary.Get             (Get, getWord16le, getWord32le,
                                               getWord8, runGet)
 import           Data.Int                    (Int32)
 import           Data.Word                   (Word16, Word32, Word8)
+import           GHC.Generics                (Generic)
 
 import           Data.Char                   (ord)
 
